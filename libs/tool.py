@@ -5,6 +5,7 @@ from addict import Dict
 import os
 import json
 
+
 def create_directory(path: str) -> bool:
     if not os.path.exists(path):
         os.makedirs(path)
@@ -22,6 +23,9 @@ def join_directory(*args, cwd_path: bool =False) -> str:
         path.insert(0, setting.CWD_PATH)
 
     return os.path.join(*path).replace("\\", "/")
+
+def get_ui_file(file_path: str = __file__) -> str:
+    return join_directory(os.path.dirname(file_path), "ui")
 
 def create_wml_setup_file() -> None:
     with open(setting.WML_SETUP_FILE, "w") as f:

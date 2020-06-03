@@ -1,6 +1,5 @@
+from libs import tool
 from addict import Dict
-
-from .tool import join_directory
 
 import os
 import sys
@@ -10,30 +9,36 @@ SUFFIX: str = ""
 
 try:
     BASE_PATH: str = sys._MEIPASS
-    CWD_PATH: str = os.getcwd()
 except:
-    BASE_PATH: str = os.path.dirname(os.getcwd())
-    CWD_PATH: str = BASE_PATH
+    BASE_PATH: str = os.getcwd()
 
-TEMP_PATH: str = join_directory(f"{PPREFIX}-temp", cwd_path=True)               # wml-temp
-ENV_PATH: str = join_directory(f"{PPREFIX}-env", cwd_path=True)                 # wml-env
+CWD_PATH: str = os.path.dirname(os.getcwd())
 
-BUILD_PATH: str = join_directory(f"{PPREFIX}-build", cwd_path=True)
-BUILD_BUILD_PATH: str = join_directory(BUILD_PATH, "build")
-BUILD_DIST_PATH: str = join_directory(BUILD_PATH, "dist")
+ASSETS_PATH: str = tool.join_directory(BASE_PATH, "assets")
+TEMP_PATH: str = tool.join_directory(f"{PPREFIX}-temp", cwd_path=True)               # wml-temp
+ENV_PATH: str = tool.join_directory(f"{PPREFIX}-env", cwd_path=True)                 # wml-env
 
-OUTPUT_PATH: str = join_directory(f"{PPREFIX}-output", cwd_path=True)           # wml-output
-OUTPUT_DATA_PATH: str = join_directory(OUTPUT_PATH, ".data")                    # wml-output/.data
+BUILD_PATH: str = tool.join_directory(f"{PPREFIX}-build", cwd_path=True)
+BUILD_BUILD_PATH: str = tool.join_directory(BUILD_PATH, "build")
+BUILD_DIST_PATH: str = tool.join_directory(BUILD_PATH, "dist")
 
-VIDEO_PATH: str = join_directory(f"{PPREFIX}-video", cwd_path=True)             # wml-video
-VIDEO_RENDER_PATH: str = join_directory(VIDEO_PATH, "render")                   # wml-video/.render
-VIDEO_FINISH_PATH: str = join_directory(VIDEO_PATH, "finish")                   # wml-video/.finish
-VIDEO_ERROR_PATH: str = join_directory(VIDEO_PATH, "error")                     # wml-video/.error
-VIDEO_UPLOAD_PATH: str = join_directory(VIDEO_PATH, "upload")                   # wml-video/.upload
+OUTPUT_PATH: str = tool.join_directory(f"{PPREFIX}-output", cwd_path=True)           # wml-output
+OUTPUT_DATA_PATH: str = tool.join_directory(OUTPUT_PATH, ".data")                    # wml-output/.data
+
+VIDEO_PATH: str = tool.join_directory(f"{PPREFIX}-video", cwd_path=True)             # wml-video
+VIDEO_RENDER_PATH: str = tool.join_directory(VIDEO_PATH, "render")                   # wml-video/.render
+VIDEO_FINISH_PATH: str = tool.join_directory(VIDEO_PATH, "finish")                   # wml-video/.finish
+VIDEO_ERROR_PATH: str = tool.join_directory(VIDEO_PATH, "error")                     # wml-video/.error
+VIDEO_UPLOAD_PATH: str = tool.join_directory(VIDEO_PATH, "upload")                   # wml-video/.upload
 
 WML_SETUP_FILE: str = f"{CWD_PATH}/{PPREFIX}-setup.json"                        # wml-setup.json
 WML_CONDA_ENV_FILE: str = f"{ENV_PATH}/{PPREFIX}-conda-env.yml"
 WML_PIP_REQUIREMENT_FILE: str = f"{ENV_PATH}/{PPREFIX}-pip-requirement.txt"
+
+
+
+VIDEO_WIDTH, VIDEO_HEIGHT = 1280, 720
+ 
 
 class SOCIAL_TYPES:
     IG: int = 0
