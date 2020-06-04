@@ -1,8 +1,18 @@
-from libs import tool
-from addict import Dict
 
+from addict import Dict
+from PyQt5.uic import loadUi
+
+import json
 import os
 import sys
+
+def join_directory(*args, cwd_path: bool =False) -> str:
+    path: list = [*args]
+    
+    if cwd_path:
+        path.insert(0, CWD_PATH)
+
+    return os.path.join(*path).replace("\\", "/")
 
 PPREFIX: str = "wml"
 SUFFIX: str = ""
@@ -14,31 +24,29 @@ except:
 
 CWD_PATH: str = os.path.dirname(os.getcwd())
 
-ASSETS_PATH: str = tool.join_directory(BASE_PATH, "assets")
-TEMP_PATH: str = tool.join_directory(f"{PPREFIX}-temp", cwd_path=True)               # wml-temp
-ENV_PATH: str = tool.join_directory(f"{PPREFIX}-env", cwd_path=True)                 # wml-env
+ASSETS_PATH: str = join_directory(BASE_PATH, "assets")
+UI_PATH:  str = join_directory(BASE_PATH, "libs", "gui", "ui")
+TEMP_PATH: str = join_directory(f"{PPREFIX}-temp", cwd_path=True)               # wml-temp
+ENV_PATH: str = join_directory(f"{PPREFIX}-env", cwd_path=True)                 # wml-env
 
-BUILD_PATH: str = tool.join_directory(f"{PPREFIX}-build", cwd_path=True)
-BUILD_BUILD_PATH: str = tool.join_directory(BUILD_PATH, "build")
-BUILD_DIST_PATH: str = tool.join_directory(BUILD_PATH, "dist")
+BUILD_PATH: str = join_directory(f"{PPREFIX}-build", cwd_path=True)
+BUILD_BUILD_PATH: str = join_directory(BUILD_PATH, "build")
+BUILD_DIST_PATH: str = join_directory(BUILD_PATH, "dist")
 
-OUTPUT_PATH: str = tool.join_directory(f"{PPREFIX}-output", cwd_path=True)           # wml-output
-OUTPUT_DATA_PATH: str = tool.join_directory(OUTPUT_PATH, ".data")                    # wml-output/.data
+OUTPUT_PATH: str = join_directory(f"{PPREFIX}-output", cwd_path=True)           # wml-output
+OUTPUT_DATA_PATH: str = join_directory(OUTPUT_PATH, ".data")                    # wml-output/.data
 
-VIDEO_PATH: str = tool.join_directory(f"{PPREFIX}-video", cwd_path=True)             # wml-video
-VIDEO_RENDER_PATH: str = tool.join_directory(VIDEO_PATH, "render")                   # wml-video/.render
-VIDEO_FINISH_PATH: str = tool.join_directory(VIDEO_PATH, "finish")                   # wml-video/.finish
-VIDEO_ERROR_PATH: str = tool.join_directory(VIDEO_PATH, "error")                     # wml-video/.error
-VIDEO_UPLOAD_PATH: str = tool.join_directory(VIDEO_PATH, "upload")                   # wml-video/.upload
+VIDEO_PATH: str = join_directory(f"{PPREFIX}-video", cwd_path=True)             # wml-video
+VIDEO_RENDER_PATH: str = join_directory(VIDEO_PATH, "render")                   # wml-video/.render
+VIDEO_FINISH_PATH: str = join_directory(VIDEO_PATH, "finish")                   # wml-video/.finish
+VIDEO_ERROR_PATH: str = join_directory(VIDEO_PATH, "error")                     # wml-video/.error
+VIDEO_UPLOAD_PATH: str = join_directory(VIDEO_PATH, "upload")                   # wml-video/.upload
 
 WML_SETUP_FILE: str = f"{CWD_PATH}/{PPREFIX}-setup.json"                        # wml-setup.json
 WML_CONDA_ENV_FILE: str = f"{ENV_PATH}/{PPREFIX}-conda-env.yml"
 WML_PIP_REQUIREMENT_FILE: str = f"{ENV_PATH}/{PPREFIX}-pip-requirement.txt"
 
-
-
 VIDEO_WIDTH, VIDEO_HEIGHT = 1280, 720
- 
 
 class SOCIAL_TYPES:
     IG: int = 0
@@ -161,3 +169,27 @@ class MEDIA_TYPES:
         PIC: "picture",
         VID: "video"
     }
+ 
+def create_directory(path: str) -> bool:
+    if not os.path.exists(path):
+        os.makedirs(path)
+        return True
+    return False
+
+# def create_temp_directory() -> None:    
+#     _dir = TemporaryDirectory(prefix=f"{PPREFIX}_")
+#     _dir.write()
+
+def load_ui(_file_: str, baseinstance: object = None) -> str:
+    ui_name = os.path.basename(_file_).replace(".py", ".ui")
+    ui_file = join_directory(UI_PATH, ui_name)
+
+    return loadUi(ui_file, baseinstance=baseinstance)
+
+def create_wml_setup_file() -> None:
+    with open(WML_SETUP_FILE, "w") as f:
+        json.dump(SOCIAL_TYPES._pattern, f, indent=4)
+
+def read_wml_setup_file() -> Dict:
+    with open(WML_SETUP_FILE, "r") as f:
+        return Dict(json.load(f))

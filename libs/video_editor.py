@@ -1,4 +1,4 @@
-from . import setting
+from . import config
 from moviepy.editor import VideoClip, VideoFileClip, CompositeVideoClip, concatenate_videoclips, ImageClip
 from skimage.filters import gaussian
 
@@ -9,23 +9,23 @@ def __blur(image):
 
 def create_video(video_path: str, video_format: str = "mp4") -> str:
     video_name = os.path.basename(video_path).replace(" ", "_").lower()
-    output_path: str = f"{setting.VIDEO_UPLOAD_PATH}/{video_name}.{video_format}"
+    output_path: str = f"{config.VIDEO_UPLOAD_PATH}/{video_name}.{video_format}"
     video_file_clips: list = []
     video_file_blur_clips: list = []
 
     for f in os.listdir(video_path):
         clip: VideoFileClip = VideoFileClip(
                 os.path.join(video_path, f),
-            # target_resolution=(setting.VIDEO_WIDTH, setting.VIDEO_HEIGHT)
+            # target_resolution=(config.VIDEO_WIDTH, config.VIDEO_HEIGHT)
             )
-            # .resize(height=setting.VIDEO_HEIGHT))
+            # .resize(height=config.VIDEO_HEIGHT))
 
         width, height = clip.size
 
         if width < 1280/2 and width > height:
-            height_resize = setting.VIDEO_HEIGHT/1.2
+            height_resize = config.VIDEO_HEIGHT/1.2
         else:
-            height_resize = setting.VIDEO_HEIGHT
+            height_resize = config.VIDEO_HEIGHT
 
         clip = clip.resize(height=height_resize)
         
@@ -36,7 +36,7 @@ def create_video(video_path: str, video_format: str = "mp4") -> str:
                 audio=False,
                 resize_algorithm="fast_bilinear"
             )
-            .resize(width=setting.VIDEO_WIDTH))
+            .resize(width=config.VIDEO_WIDTH))
 
         video_file_blur_clips.append(blur_clip)
 
@@ -48,7 +48,7 @@ def create_video(video_path: str, video_format: str = "mp4") -> str:
 
     video_blur_clip: VideoClip = concatenate_videoclips(video_file_blur_clips).fl_image(__blur)
     
-    watermark: ImageClip = (ImageClip(setting.join_directory(setting.ASSETS_PATH, "logo.png"))
+    watermark: ImageClip = (ImageClip(config.join_directory(config.ASSETS_PATH, "logo.png"))
                  .set_duration(video_clip.duration)
                  .resize(height=100)
                  .margin(left=15, right=15, top=15, bottom=15, opacity=0)
@@ -56,7 +56,7 @@ def create_video(video_path: str, video_format: str = "mp4") -> str:
 
     final_video_clip: CompositeVideoClip = CompositeVideoClip(
         [video_blur_clip, video_clip, watermark],
-        size=[setting.VIDEO_WIDTH, setting.VIDEO_HEIGHT]
+        size=[config.VIDEO_WIDTH, config.VIDEO_HEIGHT]
         )
 
     final_video_clip.write_videofile(
