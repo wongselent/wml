@@ -7,6 +7,29 @@ import os
 def __blur(image):
     return gaussian(image.astype(float), sigma=8)
 
+class RenderVideo():
+    def __init__(
+        self,
+        video_path,
+        video_format: str = "webm",
+        size: list = [config.VIDEO_WIDTH, config.VIDEO_HEIGHT],
+        fps: int = config.VIDEO_FPS,
+        bg_blur: bool = False
+    ):
+        pass
+    
+    def createClip(self):
+        pass
+    
+    def createLogo(self):
+        pass
+
+    def renderVideo(self):
+        pass
+
+    def previewVideo(self):
+        pass
+
 def create_video(
         video_path: str,
         video_format: str = "webm",

@@ -15,13 +15,17 @@ class Form(QtWidgets.QFrame):
         # self.form_edit.setPlaceHolder(placeholder)
 
 class LooterFormWidget(QtWidgets.QWidget):
-    def __init__(self, parent: QtWidgets.QWidget, name: str, placeholder: str = None) -> None:
+    def __init__(self, parent: QtWidgets.QWidget, input_title: str, placeholder: str = None) -> None:
         super(LooterFormWidget, self).__init__(parent)
         config.load_ui(self)
         self.__parent = parent
+        self.__input_title = input_title
         
         self.form_check: QtWidgets.QCheckBox
         self.form_input_edit: QtWidgets.QLineEdit
+        self.form_name_label: QtWidgets.QLabel
+        
+        self.form_name_label.setText(self.__input_title)
 
         self.form_check.clicked.connect(self._setToogleInput)
 
@@ -32,6 +36,22 @@ class LooterFormWidget(QtWidgets.QWidget):
     @checked.setter
     def checked(self, value):
         self.form_check.setChecked(value)
+    
+    @property
+    def input_text(self):
+        return self.form_input_edit.text()
+
+    @input_text.setter
+    def input_text(self, value):
+        self.form_input_edit.setText(value)
+
+    @property
+    def placeholder(self):
+        self.form_input_edit.placeholderText()
+    
+    @placeholder.setter
+    def placeholder(self, value):
+        self.form_input_edit.setPlaceholderText(value)
 
     def showEvent(self, event):
         self._setToogleInput()

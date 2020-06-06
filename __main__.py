@@ -32,8 +32,10 @@ config.read_wml_setup_file()
 # print(config.BASE_PATH, config.CWD_PATH)
 # print(os.path.isfile(config.join_directory(config.ASSETS_PATH, "logo.jpg")))
 
-from libs.gui import main_window
-main_window.run(argv=sys.argv)
+print(os.environ["test"])
+
+# from libs.gui import main_window
+# main_window.run(argv=sys.argv)
 
 # def imgClip():
 #     from moviepy.editor import ImageClip
