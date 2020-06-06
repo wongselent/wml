@@ -5,6 +5,7 @@ verify_ssl = true
 
 [scripts]
 start = "python ."
+git_commit = "git add . && git commit -m \"update all\""
 
 [dev-packages]
 pyinstaller = "*"
@@ -17,6 +18,7 @@ scikit-image = "*"
 pyqt5 = "*"
 python-dotenv = "*"
 loguru = "*"
+docopt = "*"
 
 [requires]
 python_version = "3.8"
