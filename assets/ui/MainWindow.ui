@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="main_window_layout">
     <property name="leftMargin">
      <number>10</number>
     </property>
@@ -31,6 +31,9 @@
      <widget class="QTabWidget" name="main_tabwidget">
       <property name="currentIndex">
        <number>-1</number>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
       </property>
      </widget>
     </item>

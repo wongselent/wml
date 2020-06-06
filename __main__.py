@@ -33,5 +33,17 @@ config.read_wml_setup_file()
 # print(os.path.isfile(config.join_directory(config.ASSETS_PATH, "logo.jpg")))
 
 from libs.gui import main_window
-
 main_window.run(argv=sys.argv)
+
+# def imgClip():
+#     from moviepy.editor import ImageClip
+#     from PyQt5 import QtCore, QtWidgets, QtMultimedia, QtMultimediaWidgets
+#     img_clip = ImageClip("/home/wongselent/Downloads/4.1.png")
+
+#     app = QtWidgets.QApplication(argv)
+
+#     player = QtMultimedia.QMediaPlayer()
+#     player.setMedia(QtMultimedia.QMediaContent())
+#     sys.exit(app.exec_())
+
+# print( imgClip(), type(imgClip()) )

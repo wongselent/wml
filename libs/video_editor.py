@@ -7,7 +7,13 @@ import os
 def __blur(image):
     return gaussian(image.astype(float), sigma=8)
 
-def create_video(video_path: str, video_format: str = "mp4") -> str:
+def create_video(
+        video_path: str,
+        video_format: str = "webm",
+        size : list = [config.VIDEO_WIDTH, config.VIDEO_HEIGHT],
+        fps=config.VIDEO_FPS
+    ) -> str:
+
     video_name = os.path.basename(video_path).replace(" ", "_").lower()
     output_path: str = f"{config.VIDEO_UPLOAD_PATH}/{video_name}.{video_format}"
     video_file_clips: list = []
@@ -49,10 +55,10 @@ def create_video(video_path: str, video_format: str = "mp4") -> str:
     video_blur_clip: VideoClip = concatenate_videoclips(video_file_blur_clips).fl_image(__blur)
     
     watermark: ImageClip = (ImageClip(config.join_directory(config.ASSETS_PATH, "logo.png"))
-                 .set_duration(video_clip.duration)
-                 .resize(height=100)
-                 .margin(left=15, right=15, top=15, bottom=15, opacity=0)
-                 .set_position(("left", "top")))
+        .set_duration(video_clip.duration)
+        .resize(height=100)
+        .margin(left=15, right=15, top=15, bottom=15, opacity=0)
+        .set_position(("left", "top")))
 
     final_video_clip: CompositeVideoClip = CompositeVideoClip(
         [video_blur_clip, video_clip, watermark],
@@ -61,7 +67,7 @@ def create_video(video_path: str, video_format: str = "mp4") -> str:
 
     final_video_clip.write_videofile(
         output_path,
-        fps=30,
+        fps=config.VIDEO_FPS,
         bitrate="1000k",
         threads=4,
         preset="ultrafast"
@@ -69,7 +75,7 @@ def create_video(video_path: str, video_format: str = "mp4") -> str:
 
     final_video_clip.close()
     
-    return 
+    return output_path
     
 
 

@@ -16,6 +16,7 @@ def join_directory(*args, cwd_path: bool =False) -> str:
 
 PPREFIX: str = "wml"
 SUFFIX: str = ""
+VIDEO_FPS = 60
 
 try:
     BASE_PATH: str = sys._MEIPASS
@@ -25,7 +26,7 @@ except:
 CWD_PATH: str = os.path.dirname(os.getcwd())
 
 ASSETS_PATH: str = join_directory(BASE_PATH, "assets")
-UI_PATH:  str = join_directory(BASE_PATH, "libs", "gui", "ui")
+UI_PATH:  str = join_directory(ASSETS_PATH, "ui")
 TEMP_PATH: str = join_directory(f"{PPREFIX}-temp", cwd_path=True)               # wml-temp
 ENV_PATH: str = join_directory(f"{PPREFIX}-env", cwd_path=True)                 # wml-env
 
@@ -48,6 +49,9 @@ WML_PIP_REQUIREMENT_FILE: str = f"{ENV_PATH}/{PPREFIX}-pip-requirement.txt"
 
 VIDEO_WIDTH, VIDEO_HEIGHT = 1280, 720
 
+# EXP: wml__instagram__profile__vid__wongselent__video1.mp4
+FILENAME_PATTERN = f"{PPREFIX}__{{social}}__{{looter}}__{{media_type}}__{{username}}__{{name}}"
+
 class SOCIAL_TYPES:
     IG: int = 0
     TT: int = 1
@@ -66,15 +70,6 @@ class SOCIAL_TYPES:
         TT: "tiktok",
         TW: "twitter",
         FB: "facebook" 
-    }
-
-    _url: dict = {}
-
-    _dir: dict = {
-        IG: {
-            "profile": join_directory(OUTPUT_PATH, _str[IG], "profile"),
-            "hashtag": join_directory(OUTPUT_PATH, _str[IG], "hastag")
-        }
     }
 
     _pattern: dict = {
@@ -180,8 +175,8 @@ def create_directory(path: str) -> bool:
 #     _dir = TemporaryDirectory(prefix=f"{PPREFIX}_")
 #     _dir.write()
 
-def load_ui(_file_: str, baseinstance: object = None) -> str:
-    ui_name = os.path.basename(_file_).replace(".py", ".ui")
+def load_ui(baseinstance: object = None) -> str:
+    ui_name = f"{os.path.basename(baseinstance.__class__.__name__)}.ui"
     ui_file = join_directory(UI_PATH, ui_name)
 
     return loadUi(ui_file, baseinstance=baseinstance)
@@ -193,3 +188,6 @@ def create_wml_setup_file() -> None:
 def read_wml_setup_file() -> Dict:
     with open(WML_SETUP_FILE, "r") as f:
         return Dict(json.load(f))
+
+def setStringToList(value: str, sep: str = ";"):
+    return [v.strip() for v in value.split(sep)]
