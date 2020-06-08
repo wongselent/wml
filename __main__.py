@@ -1,4 +1,5 @@
-from libs import config, video_editor
+from libs import config
+from libs import video_editor as veditor
 from libs.socials import instagram
 
 import os
@@ -32,10 +33,8 @@ config.read_wml_setup_file()
 # print(config.BASE_PATH, config.CWD_PATH)
 # print(os.path.isfile(config.join_directory(config.ASSETS_PATH, "logo.jpg")))
 
-print(os.environ["test"])
+# print(os.environ.get("test"))
 
-# from libs.gui import main_window
-# main_window.run(argv=sys.argv)
 
 # def imgClip():
 #     from moviepy.editor import ImageClip
@@ -49,3 +48,10 @@ print(os.environ["test"])
 #     sys.exit(app.exec_())
 
 # print( imgClip(), type(imgClip()) )
+
+# from libs.gui import main_window
+# main_window.run(argv=sys.argv)
+
+rd = veditor.RenderVideo("/home/wongselent/Videos/memes_1", bg_blur=True)
+rd.setSize(width= 1280, height=720, reduce=3)
+rd.renderVideo()
