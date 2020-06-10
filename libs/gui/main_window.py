@@ -1,5 +1,5 @@
 from .. import config
-from .components import tabbar_widget, social_widget, form_widget
+from .components import tabbar_widget, social_widget, form_widget, video_widget
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QTabBar, QTabWidget
 
@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         self.__create_video_tab = tabbar_widget.TabBar(self.main_tabwidget, "Create Video")
 
         self.__social_looter_tab.addWidget(social_widget.SocialLooterWidget(self))
-        self.__create_video_tab.addWidget(social_widget.CreateVideoWidget(self))
+        self.__create_video_tab.addWidget(video_widget.CreateVideoWidget(self))
 
         # self.__test()
 

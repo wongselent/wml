@@ -76,10 +76,3 @@ class SocialLooterWidget(QtWidgets.QWidget):
     def addWidget(self, *widgets) -> None:
         for widget in widgets:
             self.social_form_layout.addWidget(widget)
-
-class CreateVideoWidget(QtWidgets.QWidget):
-    def __init__(self, parent: QtWidgets.QWidget) -> None:
-        super(CreateVideoWidget, self).__init__(parent)
-        config.load_ui(self)
-
-        self.__parent = parent

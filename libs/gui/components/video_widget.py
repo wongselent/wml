@@ -1,6 +1,8 @@
 from libs import config
 from PyQt5 import QtCore, QtWidgets
+from libs import config
 
+import os
 # from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 # from PyQt5.QtMultimediaWidgets import QVideoWidget
 
@@ -17,8 +19,79 @@ from PyQt5 import QtCore, QtWidgets
 
 
 class VideoPreviewWidget(QtWidgets.QWidget):
-	def __init__(self, parent: QtWidgets.QWidget):
-		super(VideoPreviewWidget, self).__init__(parent)
-		config.load_ui(self)
-		self.__parent = parent
+    def __init__(self, parent: QtWidgets.QWidget):
+        super(VideoPreviewWidget, self).__init__(parent)
+        config.load_ui(self)
+
+        self.__parent = parent
+
+
+class CreateVideoWidget(QtWidgets.QWidget):
+    def __init__(self, parent: QtWidgets.QWidget) -> None:
+        super(CreateVideoWidget, self).__init__(parent)
+        config.load_ui(self)
+
+        self.__parent = parent
+        self.video_path_edit: QtWidgets.QLineEdit
+        self.video_intro_edit: QtWidgets.QLineEdit
+        self.video_outro_edit: QtWidgets.QLineEdit
+        self.video_path_button: QtWidgets.QPushButton
+        self.intro_path_button: QtWidgets.QPushButton
+        self.outro_path_button: QtWidgets.QPushButton
+        self.render_all_button: QtWidgets.QPushButton
+        self.video_obj_list: QtWidgets.QListWidget
+
+        self.video_path_button.clicked.connect(self.getVideoPath)
+        self.intro_path_button.clicked.connect(self.getIntroPath)
+        self.outro_path_button.clicked.connect(self.getOutroPath)
+
+    def getVideoPath(self):
+        video_data: dict = {}
+
+        root_path = QtWidgets.QFileDialog.getExistingDirectory(
+            parent=self,
+            caption="Video Path",
+            directory="/"
+        )
+
+        self.video_path_edit.setText(root_path)
+
+        for dirpath, dirnames, filenames, in os.walk(root_path):
+            for dirname in dirnames:
+                video_path = config.join_directory(dirpath, dirname)
+                video_data[video_path] = []
+                for filename in os.listdir(video_path):
+                    video_file = config.join_directory(video_path, filename)
+                    if os.path.isfile(video_file):
+                        _, ext = os.path.splitext(video_file)
+                        if ext.lower() in (".mp4", ".webm"):
+                            video_data[video_path].append(video_file)
+
+
+        print(video_data)
+
+
+    def getIntroPath(self):
+        root_path = QtWidgets.QFileDialog.getOpenFileName(
+            parent=self,
+            caption="Intro Path",
+            directory="/"
+        )
+
+        self.video_intro_edit.setText(root_path)
+
+    
+    def getOutroPath(self):
+        root_path = QtWidgets.QFileDialog.getOpenFileName(
+            parent=self,
+            caption="Intro Path",
+            directory="/"
+        )
+
+        self.video_outro_edit.setText(root_path)
+
+    def __createVideoItemWidget(self, video_data):
+        pass
+
+            
 
