@@ -24,6 +24,22 @@ class VideoPreviewWidget(QtWidgets.QWidget):
         config.load_ui(self)
 
         self.__parent = parent
+        self.__video_data: dict = {}
+
+class VideoItemWidget(object):
+    def __init__(self, parent: QtWidgets.QListWidget, video_name: str = None, video_files: list = None):
+        super(VideoItemWidget, self).__init__(parent)
+        config.load_ui(self)
+
+        self.__parent  = parent
+        self.__video_name = video_name
+        self.__video_files = video_files
+
+        self.title_label: QtWidgets.QLabel
+        self.render_progressbar: QtWidgets.QProgressBar
+        self.render_info_label: QtWidgets.QLabel
+        self.preview_button: QtWidgets.QPushButton
+        self.render_button: QtWidgets.QPushButton
 
 
 class CreateVideoWidget(QtWidgets.QWidget):
@@ -67,15 +83,20 @@ class CreateVideoWidget(QtWidgets.QWidget):
                         if ext.lower() in (".mp4", ".webm"):
                             video_data[video_path].append(video_file)
 
+        if video_data:
+            self.__createVideoItemWidget(video_data)
 
-        print(video_data)
+        self.__video_data = video_data
+
+        return video_data
 
 
     def getIntroPath(self):
         root_path = QtWidgets.QFileDialog.getOpenFileName(
             parent=self,
             caption="Intro Path",
-            directory="/"
+            directory="/",
+            filter="Video Ext (*.mp4 *.webm)"
         )
 
         self.video_intro_edit.setText(root_path)
@@ -85,13 +106,15 @@ class CreateVideoWidget(QtWidgets.QWidget):
         root_path = QtWidgets.QFileDialog.getOpenFileName(
             parent=self,
             caption="Intro Path",
-            directory="/"
+            directory="/",
+            filter="Video Ext (*.mp4 *.webm)"
         )
 
         self.video_outro_edit.setText(root_path)
 
     def __createVideoItemWidget(self, video_data):
-        pass
+        self.video_obj_list.appe
+
 
             
 
