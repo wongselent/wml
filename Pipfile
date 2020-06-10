@@ -18,6 +18,7 @@ pyqt5 = "*"
 python-dotenv = "*"
 loguru = "*"
 docopt = "*"
+qimage2ndarray = "*"
 
 [requires]
 python_version = "3.8"

@@ -49,9 +49,10 @@ config.read_wml_setup_file()
 
 # print( imgClip(), type(imgClip()) )
 
-# from libs.gui import main_window
-# main_window.run(argv=sys.argv)
+from libs.gui import main_window
+main_window.run(argv=sys.argv)
 
-rd = veditor.RenderVideo("/home/wongselent/Videos/memes_1", bg_blur=True)
-rd.setSize(width= 1280, height=720, reduce=3)
-rd.renderVideo()
+# rd = veditor.RenderVideo("/home/wongselent/Videos/memes_1", bg_blur=True)
+# rd.setSize(width= 1280, height=720, reduce=3)
+# rd.renderVideo()
+# rd.createSurface()

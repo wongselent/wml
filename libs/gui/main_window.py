@@ -3,6 +3,8 @@ from .components import tabbar_widget, social_widget, form_widget
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QTabBar, QTabWidget
 
+from PyQt5 import QtWidgets, QtGui
+
 import sys
 
 class MainWindow(QMainWindow):
@@ -21,12 +23,25 @@ class MainWindow(QMainWindow):
         self.__social_looter_tab.addWidget(social_widget.SocialLooterWidget(self))
         self.__create_video_tab.addWidget(social_widget.CreateVideoWidget(self))
 
-        # a = form_widget.LooterFormWidget(self, )
-
-        # self.addWidget(a)
+        # self.__test()
 
     def addWidget(self, widget: QWidget) -> None:
         self.main_window_layout.addWidget(widget)
+
+    def __test(self):
+        from libs import video_editor as veditor
+
+        rd = veditor.RenderVideo("/home/wongselent/Videos/memes_1", bg_blur=True)
+        rd.setSize(width=1280, height=720, reduce=3)
+
+        label = QtWidgets.QLabel(self)
+        image = rd.getFrameImage(label)
+
+        btn = QtWidgets.QPushButton("next", self)
+        btn.clicked.connect(lambda: next(image))
+
+        self.addWidget(label)
+        self.addWidget(btn)
 
 def run(argv: list =[]):
     if len(argv) > 1: sys.exit(argv)

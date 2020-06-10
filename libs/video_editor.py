@@ -1,13 +1,17 @@
 from . import config
 from moviepy.editor import VideoClip, VideoFileClip, CompositeVideoClip, concatenate_videoclips, ImageClip
 from skimage.filters import gaussian
+from PyQt5 import QtGui, QtWidgets
 
 import moviepy.editor as meditor
+import qimage2ndarray as im2array
+import numpy as np
 
 import os
 import re
 import shutil
 import tempfile
+
 
 # tempfile.tempdir
 
@@ -18,12 +22,16 @@ class RenderVideo():
     def __init__(
         self,
         video_path,
+        intro_file: str = None,
+        outro_file: str = None,
         video_format: str = "webm",
         size: list = [config.VIDEO_WIDTH, config.VIDEO_HEIGHT],
         fps: int = config.VIDEO_FPS,
         bg_blur: bool = False
     ):
         self.__video_path = video_path
+        self.__intro_file = intro_file
+        self.__outro_file = outro_file
         self.__video_format = video_format
         self.__size = size
         self.__fps = fps
@@ -32,8 +40,6 @@ class RenderVideo():
         self.__video_name: str = os.path.basename(self.__video_path).replace(" ", "_").lower()
         self.__output_file: str = f"{config.VIDEO_UPLOAD_PATH}/{self.__video_name}.{self.__video_format}"
 
-        self.__video_clip = self.createVideoClip()
-        self.__logo_clip = self.createLogo()
 
     @property
     def size(self):
@@ -50,6 +56,15 @@ class RenderVideo():
     @property
     def fps(self):
         return self.__fps
+
+    @property
+    def duration(self):
+        return self.__createFinalVideo().duration
+
+    @property
+    def frames(self):
+        fr_time: float = 1.0 / self.__fps
+        return np.arange(0, self.duration - 0.001, fr_time)
 
     def setSize(self, width: int, height: int, reduce: int = None):
         size: list = []
@@ -71,8 +86,6 @@ class RenderVideo():
                 if ext in ["mp4", self.__video_format] :
                     video_files.append(video_file)
 
-        self.__video_files = video_files
-        
         return video_files
 
     def createVideoClip(self, size: list = None) -> meditor.VideoClip:
@@ -100,6 +113,8 @@ class RenderVideo():
             .margin(left=15, right=15, top=15, bottom=15, opacity=0)
             .set_position(("left", "top")))
         
+        self.__logo_clip = logo_clip
+
         return logo_clip
 
     def renderVideo(self, bitrate: int = 1000, threads: int = 4) -> set:
@@ -133,16 +148,48 @@ class RenderVideo():
 
         return results
 
-    def previewVideo(self):
-        pass
+    def getFrameImage(self, qlabel: QtWidgets.QLabel, debug=False):
+        final_clip = self.__createFinalVideo()
+
+        for fr in self.frames:
+            image = im2array.array2qimage(final_clip.get_frame(fr))
+            if debug: print(fr, image)
+            yield qlabel.setPixmap(QtGui.QPixmap.fromImage(image))
+        
+        final_clip.close()
+
+    def getFrameImgArray(self, debug=False):
+        final_clip = self.__createFinalVideo()
+
+        for fr in self.frames:
+            if debug: print(fr)
+            yield final_clip.get_frame(fr)
+
+        final_clip.close()
     
-    def createSurface(self):
-        pass
+    def __createFinalVideo(self) -> meditor.CompositeVideoClip:
+        clips: list = [self.createVideoClip(), self.createLogo()]
+
+        if self.__intro_file:
+            clips.insert(0, self.__intro_file)
+
+        if self.__outro_file:
+            clips.insert(-1, self.__outro_file)
+
+        if self.__bg_blur:
+            clips.insert(0, self.__createBlurVideoClip())
+
+        final_video_clip = meditor.CompositeVideoClip(
+            clips,
+            size=self.__size
+        )
+
+        return final_video_clip
 
     def __createBlurVideoClip(self) -> meditor.VideoClip:
         file_clips: list =  []
 
-        for v in self.__video_files:
+        for v in self.getVideoFiles():
             video_file = (meditor.VideoFileClip(
                 v,
                 audio=False,
@@ -153,8 +200,6 @@ class RenderVideo():
             file_clips.append(video_file)
 
         blur_clip = concatenate_videoclips(file_clips).fl_image(_blurFX)
-
-        # blur_clip = self.__video_clip.resize(self.__size).fl_image(_blurFX)
 
         return blur_clip
 
