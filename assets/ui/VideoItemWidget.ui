@@ -6,49 +6,28 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>452</width>
-    <height>75</height>
+    <width>448</width>
+    <height>93</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>0</width>
-    <height>75</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
-   <item row="0" column="2" rowspan="2">
+   <item row="0" column="3" rowspan="2">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
     </widget>
    </item>
-   <item row="0" column="3" rowspan="2">
-    <widget class="QPushButton" name="render_button">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item row="0" column="1">
+    <widget class="QPushButton" name="preview_button">
+     <property name="enabled">
+      <bool>false</bool>
      </property>
      <property name="text">
-      <string>Render</string>
+      <string>Preview</string>
      </property>
     </widget>
    </item>
@@ -71,17 +50,30 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QPushButton" name="preview_button">
+   <item row="0" column="4" rowspan="2">
+    <widget class="QPushButton" name="render_button">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Render</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="open_button">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>Preview</string>
+      <string>Open</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="1" column="0" colspan="3">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QProgressBar" name="render_progressbar">

@@ -1,6 +1,7 @@
+from PyQt5 import QtWidgets
+
 from libs import config
 
-from PyQt5 import QtWidgets
 
 class Form(QtWidgets.QFrame):
     def __init__(self, parent: QtWidgets.QWidget, label_form: str = None, placeholder: str = None) -> None:
@@ -8,11 +9,12 @@ class Form(QtWidgets.QFrame):
         config.load_ui(self)
 
         self.__parent = parent
-        self.__label_form = label_form  + ":"
+        self.__label_form = label_form + ":"
         self.__placeholder = placeholder
-    
+
         self.form_label.setText(self.__label_form)
         # self.form_edit.setPlaceHolder(placeholder)
+
 
 class LooterFormWidget(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget, input_title: str, placeholder: str = None) -> None:
@@ -20,11 +22,11 @@ class LooterFormWidget(QtWidgets.QWidget):
         config.load_ui(self)
         self.__parent = parent
         self.__input_title = input_title
-        
+
         self.form_check: QtWidgets.QCheckBox
         self.form_input_edit: QtWidgets.QLineEdit
         self.form_name_label: QtWidgets.QLabel
-        
+
         self.form_name_label.setText(self.__input_title)
 
         self.form_check.clicked.connect(self._setToogleInput)
@@ -32,11 +34,11 @@ class LooterFormWidget(QtWidgets.QWidget):
     @property
     def checked(self):
         self.form_check.isChecked()
-    
+
     @checked.setter
     def checked(self, value):
         self.form_check.setChecked(value)
-    
+
     @property
     def input_text(self):
         return self.form_input_edit.text()
@@ -48,7 +50,7 @@ class LooterFormWidget(QtWidgets.QWidget):
     @property
     def placeholder(self):
         self.form_input_edit.placeholderText()
-    
+
     @placeholder.setter
     def placeholder(self, value):
         self.form_input_edit.setPlaceholderText(value)
@@ -58,7 +60,6 @@ class LooterFormWidget(QtWidgets.QWidget):
 
     def _setToogleInput(self):
         self.form_input_edit.setEnabled(self.form_check.isChecked())
-
 
 
 class GroupForm(QtWidgets.QGroupBox):
@@ -72,20 +73,20 @@ class GroupForm(QtWidgets.QGroupBox):
 
         self.setTitle(self.__title_group)
 
-        self.addForms(*self.__form_objs)
+        self.add_forms(*self.__form_objs)
 
-
-    def addForms(self, *args) -> None:
+    def add_forms(self, *args) -> None:
         for obj in args:
             if type(obj) == Form:
-                self.group_form_layout.addWidget(obj)
-        
+                self.group_form_layout.add_widget(obj)
+
         # spacer: QSpacerItem = QSpacerItem(0, 1000)
-        
+
         # self.group_form_layout.addSpacerItem(spacer)
         # self.group_form_layout.add
         # v = QVBoxLayout()
         # v.
+
 
 class GroupFormWidget(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget, title: str = None, widgets: list = None) -> None:
@@ -99,12 +100,14 @@ class GroupFormWidget(QtWidgets.QWidget):
         self.form_group_layout: QtWidgets.QVBoxLayout
 
         self.form_group.setTitle(self.__title)
-        
-        if self.__widgets:
-            self.addWidget(*self.__widgets)
 
-    
-    def addWidget(self, *widgets) -> None:
-        for widget in widgets:
-            self.form_group_layout.addWidget(widget)
-    
+        if self.__widgets:
+            config.append_widget(
+                layout=self.form_group_layout,
+                widgets=self.__widgets
+            )
+            # self.append_widget(*self.__widgets)
+
+    # def append_widget(self, *args) -> None:
+    #     for widget in args:
+    #         self.form_group_layout.addWidget(widget)

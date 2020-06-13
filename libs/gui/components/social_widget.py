@@ -1,10 +1,8 @@
-from libs import config
-from libs.socials import instagram
-from libs.gui.components import form_widget
-
 from PyQt5 import QtWidgets
 
-import time
+from libs import config
+from libs.gui.components import form_widget
+
 
 class SocialLooterWidget(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget) -> None:
@@ -17,14 +15,12 @@ class SocialLooterWidget(QtWidgets.QWidget):
             [
                 form_widget.LooterFormWidget(self, "Profile")
             ]
-            )
+        )
         self.__9gag_group_form = form_widget.GroupFormWidget(self, "9Gag")
 
         self.social_form_layout: QtWidgets.QVBoxLayout
 
-
-
-        self.addWidget(
+        self.append_widget(
             self.__instagram_group_form,
             self.__9gag_group_form
         )
@@ -43,7 +39,7 @@ class SocialLooterWidget(QtWidgets.QWidget):
 
     # def runLoot(self) -> None:
     #     self.setEnabled(False)
-        
+
     #     self.instagramLooter(
     #         self.social_values[config.SOCIAL_TYPES.IG]["profiles"],
     #         self.social_values[config.SOCIAL_TYPES.IG]["hashtag"]
@@ -73,6 +69,6 @@ class SocialLooterWidget(QtWidgets.QWidget):
 
     #     print("== Instagram Looting End. == ")
 
-    def addWidget(self, *widgets) -> None:
+    def append_widget(self, *widgets) -> None:
         for widget in widgets:
             self.social_form_layout.addWidget(widget)

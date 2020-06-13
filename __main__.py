@@ -1,9 +1,7 @@
-from libs import config
-from libs import video_editor as veditor
-from libs.socials import instagram
-
 import os
 import sys
+
+from libs import config
 
 # prepare setup tool
 prepare_paths: list = [
