@@ -18,12 +18,3 @@ class TabBar(QtWidgets.QTabBar):
 
         if self.__tab_widget:
             self.__tabbar_layout.addWidget(self.__tab_widget)
-
-        # self.main_tabwidget.addTab(self.__tab_page, "page 1")
-
-    # def append_widget(self, widget: QWidget) -> None:
-    #     self.__tabbar_layout.addWidget(widget)
-
-    # if not expand:
-    #     vspacer: QSpacerItem = QSpacerItem(0, 1000)
-    #     self.__tabbar_layout.addSpacerItem(vspacer)

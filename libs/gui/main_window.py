@@ -1,8 +1,9 @@
 import sys
+from typing import Dict
 
 from PyQt5 import QtWidgets
 
-from .components import tabbar_widget, social_widget, video_widget
+from .components import tabbar_widget, video_widget
 from .. import config
 
 
@@ -15,17 +16,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_tabwidget.setTabText(0, "WML")
         # self.main_tabwidget.setTabsClosable(True)
 
-        self.__main_tab = tabbar_widget.TabBar(
-            parent=self.main_tabwidget,
-            tab_title="WML",
-            tab_widget=None
-        )
+        # self.__main_tab = tabbar_widget.TabBar(
+        #     parent=self.main_tabwidget,
+        #     tab_title="WML",
+        #     tab_widget=None
+        # )
 
-        self.__social_looter_tab = tabbar_widget.TabBar(
-            parent=self.main_tabwidget,
-            tab_title="Social Looter",
-            tab_widget=social_widget.SocialLooterWidget(self)
-        )
+        # TODO: tab lagi dibuat
+        # self.__social_looter_tab = tabbar_widget.TabBar(
+        #     parent=self.main_tabwidget,
+        #     tab_title="Social Looter",
+        #     tab_widget=social_widget.SocialLooterWidget(self)
+        # )
 
         self.__create_video_tab = tabbar_widget.TabBar(
             parent=self.main_tabwidget,
@@ -33,25 +35,12 @@ class MainWindow(QtWidgets.QMainWindow):
             tab_widget=video_widget.CreateVideoWidget(self)
         )
 
-        # self.__social_looter_tab.append_widget(social_widget.SocialLooterWidget(self))
-        # self.__create_video_tab.append_widget(video_widget.CreateVideoWidget(self))
 
-        # config.append_widget(
-        #     layout=self.main_window_layout,
-        #     widgets=[social_widget.SocialLooterWidget(self),
-        #              video_widget.CreateVideoWidget(self)]
-        # )
-
-    # def append_widget(self, *args) -> None:
-    #     for widget in args:
-    #         self.main_window_layout.add_widget(widget)
-
-
-def run(argv: list = None):
+def run(argv: Dict[str, str] = None):
     if len(argv) > 1:
         sys.exit(argv)
 
-    app = QtWidgets.QApplication(argv)
+    app = QtWidgets.QApplication([])
     win = MainWindow()
     win.show()
     sys.exit(app.exec_())

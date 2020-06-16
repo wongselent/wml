@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d646c0512c09cebed6e9a6b08670a3908ae7ce961130ac69d02f6804da1ffe30"
+            "sha256": "91bc2cfca6881b43fbd388cbc673d7a9d1944ac1678f730811c1c986465d9159"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,14 +16,6 @@
         ]
     },
     "default": {
-        "addict": {
-            "hashes": [
-                "sha256:1948c2a5d93ba6026eb91aef2c971234aaf72488a9c07ab8a7950f82ae30eea7",
-                "sha256:f22493f056032f50e4931a82444fcba8ef74c8fc994c5d06aa546a1433c2b8b0"
-            ],
-            "index": "pypi",
-            "version": "==2.2.1"
-        },
         "certifi": {
             "hashes": [
                 "sha256:5ad7e9a056d25ffa5082862e36f119f7f7cec6457fa07ee2f8c339814b80c9b1",
@@ -87,10 +79,10 @@
         },
         "instaloader": {
             "hashes": [
-                "sha256:0826b6385084787d82ffd6ecfa3df4d6ed59daa5c774a57ce234d140c12f7f79"
+                "sha256:4a6e2baf591230fa94c9c47b51aee79cb67aa3282aca92ff302dc8cb70ee7f6c"
             ],
             "index": "pypi",
-            "version": "==4.4.3"
+            "version": "==4.4.4"
         },
         "kiwisolver": {
             "hashes": [
@@ -116,11 +108,11 @@
         },
         "loguru": {
             "hashes": [
-                "sha256:1e0e6ff59be5e22f863d909ca989e34bb14c21b374f6af45281e603d003dbb96",
-                "sha256:4688d9e1f31d70e1ec7ccce5305967bc28f377eb1048d009108c11faebe05bcf"
+                "sha256:70201d5fce26da89b7a5f168caa2bb674e06b969829f56737db1d6472e53e7c3",
+                "sha256:e5d362a43cd2fc2da63551d79a6830619c4d5b3a8b976515748026f92f351b61"
             ],
             "index": "pypi",
-            "version": "==0.5.0"
+            "version": "==0.5.1"
         },
         "matplotlib": {
             "hashes": [

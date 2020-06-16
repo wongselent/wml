@@ -1,10 +1,10 @@
 import json
 import os
 import sys
+from typing import List, Tuple, Dict
 
 from PyQt5 import QtWidgets
 from PyQt5.uic import loadUi
-from addict import Dict
 
 
 def join_directory(*args, cwd_path: bool = False) -> str:
@@ -40,10 +40,6 @@ OUTPUT_PATH: str = join_directory(f"{PPREFIX}-output", cwd_path=True)  # wml-out
 OUTPUT_DATA_PATH: str = join_directory(OUTPUT_PATH, ".data")  # wml-output/.data
 
 VIDEO_PATH: str = join_directory(f"{PPREFIX}-video", cwd_path=True)  # wml-video
-VIDEO_RENDER_PATH: str = join_directory(VIDEO_PATH, "render")  # wml-video/.render
-VIDEO_FINISH_PATH: str = join_directory(VIDEO_PATH, "finish")  # wml-video/.finish
-VIDEO_ERROR_PATH: str = join_directory(VIDEO_PATH, "error")  # wml-video/.error
-VIDEO_UPLOAD_PATH: str = join_directory(VIDEO_PATH, "upload")  # wml-video/.upload
 
 WML_SETUP_FILE: str = f"{CWD_PATH}/{PPREFIX}-setup.json"  # wml-setup.json
 WML_CONDA_ENV_FILE: str = f"{ENV_PATH}/{PPREFIX}-conda-env.yml"
@@ -51,8 +47,42 @@ WML_PIP_REQUIREMENT_FILE: str = f"{ENV_PATH}/{PPREFIX}-pip-requirement.txt"
 
 VIDEO_WIDTH, VIDEO_HEIGHT = 1280, 720
 
-# EXP: wml__instagram__profile__vid__wongselent__video1.mp4
 FILENAME_PATTERN = f"{PPREFIX}__{{social}}__{{looter}}__{{media_type}}__{{username}}__{{name}}"
+
+
+class VIDEO_RESOLUTION:
+    R144P = 0
+    R240P = 1
+    R360P = 2
+    R480P = 3
+    R720P = 4
+    R1080P = 5
+
+    _str: Dict[int, str] = {
+        R144P: "144p",
+        R240P: "240p",
+        R360P: "360p",
+        R480P: "480p",
+        R720P: "720p",
+        R1080P: "1080p"
+    }
+
+    _resolution: Dict[int, tuple] = {
+        R144P: (256, 144),
+        R240P: (426, 240),
+        R360P: (640, 360),
+        R480P: (854, 480),
+        R720P: (1280, 720),
+        R1080P: (1920, 1080)
+    }
+
+    @classmethod
+    def str(cls, value: int) -> str:
+        return cls._str[value]
+
+    @classmethod
+    def resolution(cls, value: int) -> tuple:
+        return cls._resolution[value]
 
 
 class SOCIAL_TYPES:
@@ -159,12 +189,12 @@ class MEDIA_TYPES:
     PIC: int = 0
     VID: int = 1
 
-    _code: dict = {
+    _code: Dict[int, str] = {
         PIC: "pic",
         VID: "vid"
     }
 
-    _str: dict = {
+    _str: Dict[int, str] = {
         PIC: "picture",
         VID: "video"
     }
@@ -181,14 +211,14 @@ def create_directory(path: str) -> bool:
 #     _dir = TemporaryDirectory(prefix=f"{PPREFIX}_")
 #     _dir.write()
 
-def load_ui(baseinstance: object = None) -> str:
+def load_ui(baseinstance: QtWidgets.QWidget = None) -> str:
     ui_name = f"{os.path.basename(baseinstance.__class__.__name__)}.ui"
     ui_file = join_directory(UI_PATH, ui_name)
 
     return loadUi(ui_file, baseinstance=baseinstance)
 
 
-def append_widget(layout: QtWidgets.QLayout, widgets: list = None) -> tuple:
+def append_widget(layout: QtWidgets.QLayout, widgets: Tuple[QtWidgets.QWidget] = None) -> Tuple[QtWidgets.QWidget]:
     for widget in widgets:
         layout.addWidget(widget)
 
@@ -202,8 +232,8 @@ def create_wml_setup_file() -> None:
 
 def read_wml_setup_file() -> Dict:
     with open(WML_SETUP_FILE, "r") as f:
-        return Dict(json.load(f))
+        return json.load(f)
 
 
-def set_string_to_list(value: str, sep: str = ";"):
+def set_string_to_list(value: str, sep: str = ";") -> List[str]:
     return [v.strip() for v in value.split(sep)]

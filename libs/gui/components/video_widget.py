@@ -1,4 +1,6 @@
 import os
+import threading
+from typing import List, Dict, Tuple
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -21,11 +23,8 @@ class ITEM_STATE:
     __bg_color = {}
 
     @classmethod
-    def str(cls, state):
-        if state in cls.__str.keys():
-            return cls.__str[state]
-        else:
-            raise Exception(f"{state} not in ITEM_STATE")
+    def str(cls, value: int) -> str:
+        return cls.__str[value]
 
 
 class VideoPreviewWidget(QtWidgets.QWidget):
@@ -33,21 +32,20 @@ class VideoPreviewWidget(QtWidgets.QWidget):
         super(VideoPreviewWidget, self).__init__(parent)
         config.load_ui(self)
 
-        self.__parent = parent
+        self.__parent: QtWidgets.QWidget = parent
 
 
 class VideoItemWidget(QtWidgets.QWidget):
-    state_item_signal = QtCore.pyqtSignal(int)
-    render_video_signal = QtCore.pyqtSignal()
+    render_video_signal: QtCore.pyqtSignal = QtCore.pyqtSignal()
 
     def __init__(self, parent: QtWidgets.QListWidget, video_name: str = None, video_path: str = None,
-                 video_files: list = None, video_intro: str = None, video_outro: str = None) -> None:
+                 video_files: List[str] = None, video_intro: str = None, video_outro: str = None) -> None:
         super(VideoItemWidget, self).__init__(parent)
         config.load_ui(self)
-        self.__parent = parent
-        self.__video_name = video_name
-        self.__video_path = video_path
-        self.__video_files = video_files
+        self.__parent: QtWidgets.QListWidget = parent
+        self.__video_name: str = video_name
+        self.__video_path: str = video_path
+        self.__video_files: List[str] = video_files
         self.__video_intro = video_intro
         self.__video_outro = video_outro
 
@@ -58,7 +56,9 @@ class VideoItemWidget(QtWidgets.QWidget):
             bg_blur=True
         )
 
-        self.render_progressbar.setHidden(True)
+        self.__check_video_exists(self.__render_video_obj.video_file)
+
+        # self.render_progressbar.setHidden(True)
         # self.render_info_label.setHidden(True)
         self.preview_button.setHidden(True)
         self.open_button.setHidden(True)
@@ -66,42 +66,69 @@ class VideoItemWidget(QtWidgets.QWidget):
 
         self.render_button.clicked.connect(self.render_video)
         self.render_video_signal.connect(self.render_video)
-        self.state_item_signal.connect(self.set_state_item)
 
-    QtCore.pyqtSlot()
-
+    @QtCore.pyqtSlot()
     def render_video(self) -> None:
         try:
-            self.set_state_item(ITEM_STATE.render)
-            self.__render_video_obj.set_size(width=config.VIDEO_WIDTH, height=config.VIDEO_HEIGHT, reduce=3)
-            self.__render_video_obj.render_video()
+            self.render_button.setDisabled(True)
+            # self.set_state_item(ITEM_STATE.render)
+            width, height = self.__parent.get_video_resolution()
+            self.__render_video_obj.set_size(width=width, height=height, reduce=4)
+            self.__render_video_obj.render_video(
+                progressbar_widget=self.render_progressbar
+            )
         except Exception as ex:
             print(ex)
-            self.set_state_item(ITEM_STATE.error)
             return
         else:
-            self.set_state_item(ITEM_STATE.render)
+            pass
         finally:
-            self.set_state_item(ITEM_STATE.finish)
-
-    QtCore.pyqtSlot(int)
-
-    def set_state_item(self, state) -> None:
-        self.render_info_label.setText(ITEM_STATE.str(state))
+            self.render_button.setDisabled(False)
 
     def get_video_list(self) -> None:
         print(self.__video_files)
+
+    def __setup_video_item(self):
+        # self.render_info_label.setText(str(self.__render_video_obj.duration))
+        set_render_info = threading.Thread(
+            target=lambda: self.render_info_label.setText(str(self.__render_video_obj.duration)),
+            daemon=True,
+        )
+        set_render_info.start()
+
+    def __check_video_exists(self, video_file: str) -> None:
+        if os.path.exists(video_file):
+            self.render_progressbar.setFormat("Video is Exists!")
 
 
 class CreateVideoWidget(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget) -> None:
         super(CreateVideoWidget, self).__init__(parent)
         config.load_ui(self)
-        self.__parent = parent
+        self.__parent: QtWidgets.QWidget = parent
+        self.__video_data: Dict[str, dict] = {}
+
+        self.refresh_button.setDisabled(True)
+
+        resolution_types: List[int] = [
+            config.VIDEO_RESOLUTION.R144P,
+            config.VIDEO_RESOLUTION.R240P,
+            config.VIDEO_RESOLUTION.R360P,
+            config.VIDEO_RESOLUTION.R480P,
+            config.VIDEO_RESOLUTION.R720P,
+            config.VIDEO_RESOLUTION.R1080P
+        ]
+
+        for res in resolution_types:
+            self.video_resolution_combo.addItem(
+                config.VIDEO_RESOLUTION.str(res),
+                config.VIDEO_RESOLUTION.resolution(res)
+            )
 
         self.video_path_button.clicked.connect(self.get_video_path)
         self.intro_path_button.clicked.connect(self.get_intro_path)
         self.outro_path_button.clicked.connect(self.get_outro_path)
+        self.refresh_button.clicked.connect(self.refresh_video_list)
         self.render_all_button.clicked.connect(self.do_render_all_video)
 
     def do_render_all_video(self) -> None:
@@ -110,22 +137,10 @@ class CreateVideoWidget(QtWidgets.QWidget):
         for i in range(item_count):
             item: QtWidgets.QListWidgetItem = self.video_obj_list.item(i)
             item_widget: VideoItemWidget = self.video_obj_list.itemWidget(item)
-
             item_widget.render_video_signal.emit()
-            # try:
-            #     item_widget.state_item_signal.emit(ITEM_STATE.render)
-            #
-            # except Exception as ex:
-            #     print(ex)
-            #     item_widget.state_item_signal.emit(ITEM_STATE.error)
-            #     return
-            # else:
-            #     item_widget.state_item_signal.emit(ITEM_STATE.render)
-            # finally:
-            #     item_widget.state_item_signal.emit(ITEM_STATE.finish)
 
-    def get_video_path(self) -> dict:
-        video_data: dict = {}
+    def get_video_path(self) -> Dict[str, dict]:
+        video_data: Dict[str, dict] = {}
 
         root_path = QtWidgets.QFileDialog.getExistingDirectory(
             parent=self,
@@ -138,9 +153,9 @@ class CreateVideoWidget(QtWidgets.QWidget):
         for dirpath, dirnames, filenames, in os.walk(root_path):
             for dirname in dirnames:
                 video_path = config.join_directory(dirpath, dirname)
-                video_data[dirname] = {}
-                video_data[dirname]["video_path"] = video_path
-                video_data[dirname]["video_files"] = []
+                video_data[dirname]: Dict[str, str] = {}
+                video_data[dirname]["video_path"]: str = video_path
+                video_data[dirname]["video_files"]: List[str] = []
                 for filename in os.listdir(video_path):
                     video_file = config.join_directory(video_path, filename)
                     if os.path.isfile(video_file):
@@ -150,41 +165,55 @@ class CreateVideoWidget(QtWidgets.QWidget):
                             # video_data[video_path].append(video_file)
 
         if video_data:
+            self.__video_data = video_data
             self.__create_video_item_widget(video_data)
+            self.refresh_button.setDisabled(False)
 
         return video_data
 
     def get_intro_path(self) -> None:
-        root_path = QtWidgets.QFileDialog.getOpenFileName(
+        video_file, _ = QtWidgets.QFileDialog.getOpenFileName(
             parent=self,
             caption="Intro Path",
             directory="/",
             filter="Video Ext (*.mp4 *.webm)"
         )
 
-        self.video_intro_edit.setText(root_path)
+        self.video_intro_edit.setText(video_file)
+        self.refresh_video_list()
 
     def get_outro_path(self) -> None:
-        root_path = QtWidgets.QFileDialog.getOpenFileName(
+        video_file, _ = QtWidgets.QFileDialog.getOpenFileName(
             parent=self,
-            caption="Intro Path",
+            caption="Outro Path",
             directory="/",
             filter="Video Ext (*.mp4 *.webm)"
         )
 
-        self.video_outro_edit.setText(root_path)
+        self.video_outro_edit.setText(video_file)
+        self.refresh_video_list()
 
-    def __create_video_item_widget(self, video_data: dict) -> None:
+    def get_video_resolution(self) -> Tuple[int]:
+        current_index: int = self.video_resolution_combo.currentIndex()
+        return tuple(self.video_resolution_combo.itemData(current_index, QtCore.Qt.UserRole))
+
+    def refresh_video_list(self) -> None:
+        if self.__video_data:
+            self.__create_video_item_widget(video_data=self.__video_data)
+
+    def __create_video_item_widget(self, video_data: Dict[str, dict]) -> None:
         self.video_obj_list.clear()
         for vid_key, vid_val in video_data.items():
             item: QtWidgets.QListWidgetItem = QtWidgets.QListWidgetItem(self.video_obj_list)
-            item_data: dict = {
+
+            item_data: Dict[str, str] = {
                 "video_title": vid_key,
                 "video_path": vid_val["video_path"],
                 "video_files": vid_val["video_files"]
             }
+
             item_widget: VideoItemWidget = VideoItemWidget(
-                self.video_obj_list,
+                self,
                 video_name=vid_key,
                 video_path=vid_val["video_path"],
                 video_files=vid_val["video_files"],
@@ -193,9 +222,7 @@ class CreateVideoWidget(QtWidgets.QWidget):
             )
 
             item.setData(QtCore.Qt.UserRole, item_data)
-            item.setSizeHint(item_widget.sizeHint())
-            item_widget.state_item_signal.emit(ITEM_STATE.start)
-            item_widget.set_state_item(ITEM_STATE.start)
+            item.setSizeHint(item_widget.size())
 
             self.video_obj_list.addItem(item)
             self.video_obj_list.setItemWidget(item, item_widget)

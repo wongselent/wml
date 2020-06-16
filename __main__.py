@@ -1,18 +1,15 @@
 import os
 import sys
+from typing import List
 
 from libs import config
 
 # prepare setup tool
-prepare_paths: list = [
+prepare_paths: List[str] = [
     config.TEMP_PATH,
     config.BUILD_PATH,
     config.ENV_PATH,
-    config.OUTPUT_DATA_PATH,
-    config.VIDEO_RENDER_PATH,
-    config.VIDEO_FINISH_PATH,
-    config.VIDEO_ERROR_PATH,
-    config.VIDEO_UPLOAD_PATH
+    config.OUTPUT_DATA_PATH
 ]
 
 for path in prepare_paths:
@@ -20,7 +17,6 @@ for path in prepare_paths:
 
 if not os.path.exists(config.WML_SETUP_FILE):
     config.create_wml_setup_file()
-
 
 config.read_wml_setup_file()
 
@@ -48,6 +44,7 @@ config.read_wml_setup_file()
 # print( imgClip(), type(imgClip()) )
 
 from libs.gui import main_window
+
 main_window.run(argv=sys.argv)
 
 # rd = veditor.RenderVideo("/home/wongselent/Videos/memes_1", bg_blur=True)

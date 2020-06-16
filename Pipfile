@@ -10,7 +10,6 @@ start = "python ."
 pyinstaller = "*"
 
 [packages]
-addict = "*"
 moviepy = "*"
 instaloader = "*"
 scikit-image = "*"
