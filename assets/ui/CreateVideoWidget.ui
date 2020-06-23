@@ -24,7 +24,7 @@
     <number>0</number>
    </property>
    <item row="1" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="options_group">
      <property name="title">
       <string>Options</string>
      </property>
@@ -129,6 +129,12 @@
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
     </widget>
    </item>
    <item row="3" column="0" colspan="2">
@@ -136,7 +142,7 @@
      <item>
       <widget class="QToolButton" name="refresh_button">
        <property name="text">
-        <string>r</string>
+        <string>Refresh</string>
        </property>
       </widget>
      </item>
@@ -150,7 +156,7 @@
     </layout>
    </item>
    <item row="0" column="0" colspan="2">
-    <widget class="QFrame" name="frame">
+    <widget class="QFrame" name="video_path_frame">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>

@@ -1,16 +1,17 @@
 import sys
 from typing import Dict
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
-from .components import tabbar_widget, video_widget
-from .. import config
+from libs import config, thread
+from libs.gui.components import tabbar_widget, video_widget
 
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self) -> None:
         super(MainWindow, self).__init__()
         config.load_ui(self)
+        self.thread_pool: QtCore.QThreadPool = thread.ThreadPool(parent=self)
 
         self.setWindowTitle("WML v0.1.0: Nasilotek")
         self.main_tabwidget.setTabText(0, "WML")
@@ -21,6 +22,8 @@ class MainWindow(QtWidgets.QMainWindow):
         #     tab_title="WML",
         #     tab_widget=None
         # )
+
+        # test_thread.run_func(self.__test_worker)
 
         # TODO: tab lagi dibuat
         # self.__social_looter_tab = tabbar_widget.TabBar(
@@ -34,6 +37,9 @@ class MainWindow(QtWidgets.QMainWindow):
             tab_title="Create Video",
             tab_widget=video_widget.CreateVideoWidget(self)
         )
+
+    def closeEvent(self, event) -> None:
+        pass
 
 
 def run(argv: Dict[str, str] = None):

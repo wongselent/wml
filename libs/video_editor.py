@@ -16,7 +16,7 @@ tempfile.tempdir = config.TEMP_PATH
 
 
 def _blur_fx(image) -> filters.gaussian:
-    return filters.gaussian(image.astype(float), sigma=8)
+    return filters.gaussian(image.astype(float), sigma=6)
 
 
 class RenderProgressLogger(proglog.ProgressBarLogger):
@@ -54,7 +54,7 @@ class RenderVideo(object):
             bg_blur: bool = False
     ):
         if size is None:
-            size = (config.VIDEO_WIDTH, config.VIDEO_HEIGHT)
+            size = config.VIDEO_RESOLUTION.resolution(config.VIDEO_RESOLUTION.R720P)
         self.__video_path: str = video_path
         self.__intro_file: str = intro_file
         self.__outro_file: str = outro_file
@@ -63,7 +63,7 @@ class RenderVideo(object):
         self.__fps: int = fps
         self.__bg_blur: bool = bg_blur
 
-        self.__size = self.__size if self.__size else (config.VIDEO_WIDTH, config.VIDEO_HEIGHT)
+        self.__size = self.__size if self.__size else config.VIDEO_RESOLUTION.resolution(config.VIDEO_RESOLUTION.R720P)
 
         self.__video_name: str = os.path.basename(self.__video_path).replace(" ", "_").lower()
         self.__output_file: str = f"{config.VIDEO_PATH}/{self.__video_name}.{self.__video_format}"
@@ -106,8 +106,6 @@ class RenderVideo(object):
         for i, s in enumerate([width, height]):
             if reduce:
                 s = s / reduce
-            if s < 50:
-                raise Exception(f"size {s}, under 50. Minimum size 150!")
             size.insert(i, int(s))
 
         self.__size = size
@@ -152,7 +150,7 @@ class RenderVideo(object):
         logo_clip: editor.ImageClip = (editor.ImageClip(logo_file)
                                        .set_duration(self.create_video_clip().duration)
                                        .resize(height=self.__size[1] / 6)
-                                       .margin(left=15, right=15, top=15, bottom=15, opacity=0)
+                                       # .margin(left=15, right=15, top=15, bottom=15, opacity=0)
                                        .set_position(("left", "top")))
 
         return logo_clip

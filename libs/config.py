@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Union, Callable
 
 from PyQt5 import QtWidgets
 from PyQt5.uic import loadUi
@@ -45,7 +45,7 @@ WML_SETUP_FILE: str = f"{CWD_PATH}/{PPREFIX}-setup.json"  # wml-setup.json
 WML_CONDA_ENV_FILE: str = f"{ENV_PATH}/{PPREFIX}-conda-env.yml"
 WML_PIP_REQUIREMENT_FILE: str = f"{ENV_PATH}/{PPREFIX}-pip-requirement.txt"
 
-VIDEO_WIDTH, VIDEO_HEIGHT = 1280, 720
+# VIDEO_WIDTH, VIDEO_HEIGHT = 1280, 720
 
 FILENAME_PATTERN = f"{PPREFIX}__{{social}}__{{looter}}__{{media_type}}__{{username}}__{{name}}"
 
@@ -223,6 +223,16 @@ def append_widget(layout: QtWidgets.QLayout, widgets: Tuple[QtWidgets.QWidget] =
         layout.addWidget(widget)
 
     return widgets
+
+
+def set_disabled_widgets(*widgets: Tuple[QtWidgets.QWidget], state: bool = True) -> Callable[[bool], None]:
+    def _set_disabled_widgets(st: bool) -> None:
+        for widget in widgets:
+            widget: QtWidgets.QWidget
+            widget.setDisabled(st)
+
+    _set_disabled_widgets(state)
+    return _set_disabled_widgets
 
 
 def create_wml_setup_file() -> None:

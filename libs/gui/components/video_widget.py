@@ -1,10 +1,10 @@
 import os
 import threading
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Union
 
 from PyQt5 import QtCore, QtWidgets
 
-from libs import config, video_editor
+from libs import config, thread, video_editor
 
 
 class ITEM_STATE:
@@ -46,59 +46,62 @@ class VideoItemWidget(QtWidgets.QWidget):
         self.__video_name: str = video_name
         self.__video_path: str = video_path
         self.__video_files: List[str] = video_files
-        self.__video_intro = video_intro
-        self.__video_outro = video_outro
+        self.__video_intro: str = video_intro
+        self.__video_outro: str = video_outro
+        self.__render_video_obj: video_editor.RenderVideo = None
 
-        self.__render_video_obj: video_editor.RenderVideo = video_editor.RenderVideo(
-            self.__video_path,
-            intro_file=self.__video_intro,
-            outro_file=self.__video_outro,
-            bg_blur=True
-        )
-
-        self.__check_video_exists(self.__render_video_obj.video_file)
-
-        # self.render_progressbar.setHidden(True)
-        # self.render_info_label.setHidden(True)
-        self.preview_button.setHidden(True)
-        self.open_button.setHidden(True)
-        self.title_label.setText(self.__video_name)
+        self.__setup_video_item()
 
         self.render_button.clicked.connect(self.render_video)
         self.render_video_signal.connect(self.render_video)
 
     @QtCore.pyqtSlot()
     def render_video(self) -> None:
-        try:
-            self.render_button.setDisabled(True)
-            # self.set_state_item(ITEM_STATE.render)
-            width, height = self.__parent.get_video_resolution()
-            self.__render_video_obj.set_size(width=width, height=height, reduce=4)
-            self.__render_video_obj.render_video(
-                progressbar_widget=self.render_progressbar
-            )
-        except Exception as ex:
-            print(ex)
-            return
-        else:
-            pass
-        finally:
-            self.render_button.setDisabled(False)
+        self.render_button.setText("Rendering...")
+        self.render_button.setDisabled(True)
+
+        width, height = self.__parent.get_video_resolution()
+        self.__render_video_obj.set_size(width=width, height=height)
+        self.__render_video_obj.render_video(
+            progressbar_widget=self.render_progressbar
+        )
+
+        self.__check_video_exists(self.__render_video_obj.video_file)
 
     def get_video_list(self) -> None:
         print(self.__video_files)
 
-    def __setup_video_item(self):
-        # self.render_info_label.setText(str(self.__render_video_obj.duration))
-        set_render_info = threading.Thread(
-            target=lambda: self.render_info_label.setText(str(self.__render_video_obj.duration)),
-            daemon=True,
-        )
-        set_render_info.start()
+    def __set_hidden_components(self, state: bool):
+        self.render_info_label.setHidden(True)
+        self.render_progressbar.setHidden(state)
+        self.preview_button.setHidden(state)
+        self.open_button.setHidden(state)
+        self.render_button.setHidden(state)
 
     def __check_video_exists(self, video_file: str) -> None:
         if os.path.exists(video_file):
+            self.render_button.setText("Rerender")
             self.render_progressbar.setFormat("Video is Exists!")
+
+    def __set_render_video_obj(self) -> str:
+        self.__render_video_obj: video_editor.RenderVideo = video_editor.RenderVideo(
+            self.__video_path,
+            intro_file=self.__video_intro,
+            outro_file=self.__video_outro,
+            bg_blur=True
+        )
+        return "Render Video Object is Created!"
+
+    def __setup_video_item(self):
+        self.title_label.setText(f"{self.__video_name}              [ Item Loading... ]"),
+        self.__set_hidden_components(True),
+
+        self.__parent.thread_pool.run_functions(
+            self.__set_render_video_obj,
+            lambda: self.title_label.setText(f"{self.__video_name}              [ {self.__render_video_obj.duration} ]"),
+            lambda: self.__set_hidden_components(False),
+            lambda: self.__check_video_exists(self.__render_video_obj.video_file),
+        )
 
 
 class CreateVideoWidget(QtWidgets.QWidget):
@@ -107,8 +110,13 @@ class CreateVideoWidget(QtWidgets.QWidget):
         config.load_ui(self)
         self.__parent: QtWidgets.QWidget = parent
         self.__video_data: Dict[str, dict] = {}
+        self.thread_pool: thread.ThreadPool = thread.ThreadPool(parent=self)
 
-        self.refresh_button.setDisabled(True)
+        self.__disable_widgets = config.set_disabled_widgets(
+            self.refresh_button,
+            self.render_all_button,
+            state=True
+        )
 
         resolution_types: List[int] = [
             config.VIDEO_RESOLUTION.R144P,
@@ -167,7 +175,9 @@ class CreateVideoWidget(QtWidgets.QWidget):
         if video_data:
             self.__video_data = video_data
             self.__create_video_item_widget(video_data)
-            self.refresh_button.setDisabled(False)
+            self.__disable_widgets(False)
+            # self.refresh_button.setDisabled(False)
+            # self.render_all_button.setDisabled(False)
 
         return video_data
 
