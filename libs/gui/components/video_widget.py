@@ -1,10 +1,9 @@
 import os
-import threading
-from typing import List, Dict, Tuple, Union
+from typing import List, Dict, Tuple
 
 from PyQt5 import QtCore, QtWidgets
 
-from libs import config, thread, video_editor
+from libs import config, video_editor
 
 
 class ITEM_STATE:
@@ -39,7 +38,8 @@ class VideoItemWidget(QtWidgets.QWidget):
     render_video_signal: QtCore.pyqtSignal = QtCore.pyqtSignal()
 
     def __init__(self, parent: QtWidgets.QListWidget, video_name: str = None, video_path: str = None,
-                 video_files: List[str] = None, video_intro: str = None, video_outro: str = None) -> None:
+                 video_files: List[str] = None, video_intro: str = None, video_outro: str = None,
+                 threadpool_obj: QtCore.QThreadPool = None) -> None:
         super(VideoItemWidget, self).__init__(parent)
         config.load_ui(self)
         self.__parent: QtWidgets.QListWidget = parent
@@ -48,7 +48,8 @@ class VideoItemWidget(QtWidgets.QWidget):
         self.__video_files: List[str] = video_files
         self.__video_intro: str = video_intro
         self.__video_outro: str = video_outro
-        self.__render_video_obj: video_editor.RenderVideo = None
+        self.__render_video_obj: video_editor.RenderVideo
+        self.__threadpool_obj: QtCore.QThreadPool = threadpool_obj
 
         self.__setup_video_item()
 
@@ -93,24 +94,26 @@ class VideoItemWidget(QtWidgets.QWidget):
         return "Render Video Object is Created!"
 
     def __setup_video_item(self):
-        self.title_label.setText(f"{self.__video_name}              [ Item Loading... ]"),
+        self.title_label.setText(f"{self.__video_name} [ Item Loading... ]"),
         self.__set_hidden_components(True),
 
-        self.__parent.thread_pool.run_functions(
+        self.__threadpool_obj.run_functions(
             self.__set_render_video_obj,
-            lambda: self.title_label.setText(f"{self.__video_name}              [ {self.__render_video_obj.duration} ]"),
+            lambda: self.title_label.setText(
+                f"{self.__video_name} [ {self.__render_video_obj.duration} ]"),
             lambda: self.__set_hidden_components(False),
             lambda: self.__check_video_exists(self.__render_video_obj.video_file),
         )
 
 
 class CreateVideoWidget(QtWidgets.QWidget):
-    def __init__(self, parent: QtWidgets.QWidget) -> None:
+    def __init__(self, parent: QtWidgets.QWidget, threadpool_obj: QtCore.QThreadPool = None) -> None:
         super(CreateVideoWidget, self).__init__(parent)
         config.load_ui(self)
         self.__parent: QtWidgets.QWidget = parent
+        self.__threadpool_obj = threadpool_obj
         self.__video_data: Dict[str, dict] = {}
-        self.thread_pool: thread.ThreadPool = thread.ThreadPool(parent=self)
+        # self.__threadpool_obj: thread.ThreadPool = thread.ThreadPool(parent=self)
 
         self.__disable_widgets = config.set_disabled_widgets(
             self.refresh_button,
@@ -228,7 +231,8 @@ class CreateVideoWidget(QtWidgets.QWidget):
                 video_path=vid_val["video_path"],
                 video_files=vid_val["video_files"],
                 video_intro=self.video_intro_edit.text(),
-                video_outro=self.video_outro_edit.text()
+                video_outro=self.video_outro_edit.text(),
+                threadpool_obj=self.__threadpool_obj
             )
 
             item.setData(QtCore.Qt.UserRole, item_data)

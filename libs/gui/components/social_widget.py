@@ -26,6 +26,19 @@ class SocialLooterWidget(QtWidgets.QWidget):
         )
         # self.loot_button.clicked.connect(self.runLoot)
 
+    def append_widget(self, *widgets) -> None:
+        for widget in widgets:
+            self.social_form_layout.addWidget(widget)
+
+
+class InstagramLooterWidget(QtWidgets.QWidget):
+    def __init__(self, parent: QtWidgets.QWidget) -> None:
+        super(InstagramLooterWidget, self).__init__(parent)
+        config.load_ui(self)
+
+        self.__parent = parent
+
+
     # @property
     # def social_values(self) -> dict:
     #     data = {
@@ -68,7 +81,3 @@ class SocialLooterWidget(QtWidgets.QWidget):
     #                     return
 
     #     print("== Instagram Looting End. == ")
-
-    def append_widget(self, *widgets) -> None:
-        for widget in widgets:
-            self.social_form_layout.addWidget(widget)

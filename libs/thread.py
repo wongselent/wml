@@ -1,4 +1,4 @@
-from typing import Any, Dict, Union, Callable
+from typing import Any, Dict, Callable
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -20,38 +20,17 @@ class THREAD_STATE:
     def str(cls, value: int) -> str:
         return cls.__str[value]
 
-# class FuncWorker(QtCore.QRunnable):
-#     def __init__(self, func: Union, *args: Tuple[Any], **kwargs: Dict[Any, Any]) -> None:
-#         super(FuncWorker, self).__init__()
-#         self.__func = func
-#         self.__args = args
-#         self.__kwargs = kwargs
-
-#         self.setAutoDelete(True)
-
-#     @QtCore.pyqtSlot()
-#     def run(self) -> None:
-#         self.__func(*self.__args, **self.__kwargs)
-
-# def run_in_thread(*func) -> Callable[[Any], Any]:
-#
-#     def _run_in_thread(fn) -> None:
-#         print(func, fn)
-#
-#     return _run_in_thread
-
 
 class FuncWorker(QtCore.QRunnable):
     def __init__(self, *funcs: Callable[[Any], Any]) -> None:
         super(FuncWorker, self).__init__()
         self.__funcs = funcs
-
         self.setAutoDelete(True)
 
     @QtCore.pyqtSlot()
-    def run(self) -> Any:
+    def run(self) -> None:
         for func in self.__funcs:
-            result: Callable[[Any], Any] = None
+            result: Callable = None
             try:
                 result = func()
             except Exception as ex:

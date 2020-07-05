@@ -17,22 +17,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_tabwidget.setTabText(0, "WML")
         # self.main_tabwidget.setTabsClosable(True)
 
-        self.__main_tab = tabbar_widget.TabBar(
-            parent=self.main_tabwidget,
-            tab_title="WML",
-            tab_widget=None
-        )
+        # self.__main_tab = tabbar_widget.TabBar(
+        #     parent=self.main_tabwidget,
+        #     tab_title="WML",
+        #     tab_widget=None
+        # )
 
-        self.__social_looter_tab = tabbar_widget.TabBar(
-            parent=self.main_tabwidget,
-            tab_title="Social Looter",
-            tab_widget=social_widget.SocialLooterWidget(self)
-        )
+        # self.__social_looter_tab = tabbar_widget.TabBar(
+        #     parent=self.main_tabwidget,
+        #     tab_title="Social Looter",
+        #     tab_widget=social_widget.SocialLooterWidget(self)
+        # )
 
         self.__create_video_tab = tabbar_widget.TabBar(
             parent=self.main_tabwidget,
             tab_title="Create Video",
-            tab_widget=video_widget.CreateVideoWidget(self)
+            tab_widget=video_widget.CreateVideoWidget(parent=self, threadpool_obj=self.thread_pool)
         )
 
     def closeEvent(self, event) -> None:
