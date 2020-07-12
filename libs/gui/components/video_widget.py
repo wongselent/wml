@@ -1,3 +1,4 @@
+import datetime
 import os
 from typing import List, Dict, Tuple
 
@@ -95,13 +96,13 @@ class VideoItemWidget(QtWidgets.QWidget):
         return "Render Video Object is Created!"
 
     def __setup_video_item(self):
-        self.title_label.setText(f"{self.__video_name} [ Loading Item... - Generate Video Object]"),
-        self.__set_hidden_components(True),
+        self.title_label.setText(f"{self.__video_name} [ Loading Item...")
+        self.__set_hidden_components(True)
 
         self.__threadpool_obj.run_functions(
             self.__set_render_video_obj,
             lambda: self.title_label.setText(
-                f"{self.__video_name} [ Duration: {self.__render_video_obj.duration} ]"),
+                f"{self.__video_name} [ Duration: {datetime.timedelta(seconds=self.__render_video_obj.duration())} ]"),
             lambda: self.__set_hidden_components(False),
             lambda: self.__check_video_exists(self.__render_video_obj.video_file),
         )

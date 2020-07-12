@@ -1,7 +1,6 @@
 import os
 import shutil
 import tempfile
-import datetime
 from typing import List, Any
 
 import numpy as np
@@ -89,19 +88,17 @@ class RenderVideo(object):
     def fps(self) -> int:
         return self.__fps
 
-    @property
-    def duration(self) -> datetime.timedelta:
-        duration = self.create_video_clip().duration
-        return datetime.timedelta(seconds=duration)
+    def duration(self) -> float:
+        duration: float = np.array([v.duration for v in self.get_video_clips()]).sum()
+        return duration
 
-    @property
     def frames(self) -> np.ndarray:
         fr_time: float = 1.0 / self.__fps
-        return np.arange(0, self.duration - 0.001, fr_time)
+        return np.arange(0, self.duration() - 0.001, fr_time)
 
     @property
     def frame_count(self) -> int:
-        return len(self.frames)
+        return len(self.frames())
 
     def set_size(self, width: int, height: int, reduce: int = None) -> None:
         size: List[int] = []
@@ -130,14 +127,21 @@ class RenderVideo(object):
 
         return video_files
 
-    def create_video_clip(self, size: List[int] = None) -> editor.VideoClip:
-        file_clips: List[str] = []
-        width, height = size if size else self.__size
+    def get_video_clips(self) -> List[editor.VideoFileClip]:
+        video_clips: List[editor.VideoFileClip] = []
 
         for v in self.get_video_files():
-            file_clip = (editor.VideoFileClip(v)
-                         .resize(height=height))
+            video_clip: editor.VideoFileClip = editor.VideoFileClip(v)
+            video_clips.append(video_clip)
 
+        return video_clips
+
+    def create_video_clip(self, size: List[int] = None) -> editor.VideoClip:
+        file_clips: List[editor.VideoFileClip] = []
+        width, height = size if size else self.__size
+
+        for v in self.get_video_clips():
+            file_clip = v.resize(height=height)
             file_clips.append(file_clip)
 
         video_clip = (editor.concatenate_videoclips(
@@ -157,7 +161,7 @@ class RenderVideo(object):
 
         return logo_clip
 
-    def render_video(self, bitrate: int = 1000, threads: int = 4,
+    def render_video(self, bitrate: int = 1000, threads: int = 1,
                      progressbar_widget: QtWidgets.QProgressBar = None) -> tuple:
         clips: List[Any] = [self.create_video_clip(), self.create_logo()]
 
@@ -197,7 +201,7 @@ class RenderVideo(object):
     def get_frame_image(self, label_widget: QtWidgets.QLabel) -> Any:
         final_clip = self.__create_final_video()
 
-        for fr in self.frames:
+        for fr in self.frames():
             image = im2array.array2qimage(final_clip.get_frame(fr))
             yield label_widget.setPixmap(QtGui.QPixmap.fromImage(image))
 
@@ -206,7 +210,7 @@ class RenderVideo(object):
     def get_frame_img_array(self) -> Any:
         final_clip = self.__create_final_video()
 
-        for fr in self.frames:
+        for fr in self.frames():
             yield final_clip.get_frame(fr)
 
         final_clip.close()
@@ -225,17 +229,18 @@ class RenderVideo(object):
         return final_video_clip
 
     def __create_blur_video_clip(self) -> editor.VideoClip:
-        file_clips: List[str] = []
+        file_clips: List[editor.VideoFileClip] = []
 
         for v in self.get_video_files():
-            video_file = (editor.VideoFileClip(
+            video_clip: editor.VideoFileClip = (editor.VideoFileClip(
                 v,
                 audio=False,
                 target_resolution=self.__size,
                 resize_algorithm="fast_bilinear"
             )
-                          .resize(self.__size))
-            file_clips.append(video_file)
+                                                .resize(self.__size))
+
+            file_clips.append(video_clip)
 
         blur_clip = editor.concatenate_videoclips(file_clips).fl_image(_blur_fx)
 
