@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+import datetime
 from typing import List, Any
 
 import numpy as np
@@ -89,8 +90,9 @@ class RenderVideo(object):
         return self.__fps
 
     @property
-    def duration(self) -> int:
-        return self.create_video_clip().duration
+    def duration(self) -> datetime.timedelta:
+        duration = self.create_video_clip().duration
+        return datetime.timedelta(seconds=duration)
 
     @property
     def frames(self) -> np.ndarray:

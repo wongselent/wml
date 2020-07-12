@@ -82,6 +82,7 @@ class VideoItemWidget(QtWidgets.QWidget):
     def __check_video_exists(self, video_file: str) -> None:
         if os.path.exists(video_file):
             self.render_button.setText("Rerender")
+            self.render_button.setDisabled(False)
             self.render_progressbar.setFormat("Video is Exists!")
 
     def __set_render_video_obj(self) -> str:
@@ -94,13 +95,13 @@ class VideoItemWidget(QtWidgets.QWidget):
         return "Render Video Object is Created!"
 
     def __setup_video_item(self):
-        self.title_label.setText(f"{self.__video_name} [ Item Loading... ]"),
+        self.title_label.setText(f"{self.__video_name} [ Loading Item... - Generate Video Object]"),
         self.__set_hidden_components(True),
 
         self.__threadpool_obj.run_functions(
             self.__set_render_video_obj,
             lambda: self.title_label.setText(
-                f"{self.__video_name} [ {self.__render_video_obj.duration} ]"),
+                f"{self.__video_name} [ Duration: {self.__render_video_obj.duration} ]"),
             lambda: self.__set_hidden_components(False),
             lambda: self.__check_video_exists(self.__render_video_obj.video_file),
         )
