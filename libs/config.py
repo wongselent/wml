@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from typing import List, Tuple, Dict, Union, Callable
+from typing import List, Tuple, Dict, Callable
 
 from PyQt5 import QtWidgets
 from PyQt5.uic import loadUi
@@ -22,7 +22,7 @@ VIDEO_FPS = 60
 
 try:
     BASE_PATH: str = sys._MEIPASS
-except:
+except AttributeError:
     BASE_PATH: str = os.getcwd()
 
 CWD_PATH: str = os.path.dirname(os.getcwd())
@@ -58,7 +58,7 @@ class VIDEO_RESOLUTION:
     R720P = 4
     R1080P = 5
 
-    _str: Dict[int, str] = {
+    __str: Dict[int, str] = {
         R144P: "144p",
         R240P: "240p",
         R360P: "360p",
@@ -67,7 +67,7 @@ class VIDEO_RESOLUTION:
         R1080P: "1080p"
     }
 
-    _resolution: Dict[int, tuple] = {
+    __resolution: Dict[int, tuple] = {
         R144P: (256, 144),
         R240P: (426, 240),
         R360P: (640, 360),
@@ -78,11 +78,11 @@ class VIDEO_RESOLUTION:
 
     @classmethod
     def str(cls, value: int) -> str:
-        return cls._str[value]
+        return cls.__str.get(value)
 
     @classmethod
     def resolution(cls, value: int) -> tuple:
-        return cls._resolution[value]
+        return cls.__resolution.get(value)
 
 
 class SOCIAL_TYPES:
@@ -91,113 +91,50 @@ class SOCIAL_TYPES:
     TW: int = 3
     FB: int = 4
 
-    _code: dict = {
+    __code: Dict[int, str] = {
         IG: "ig",
         TT: "tt",
         TW: "tw",
         FB: "fb"
     }
 
-    _str: dict = {
+    __str: Dict[int, str] = {
         IG: "instagram",
         TT: "tiktok",
         TW: "twitter",
         FB: "facebook"
     }
 
-    _pattern: dict = {
-        "active_setup": {
-            "instagram": 1,
-            "twitter": 0,
-            "tiktok": 0,
-            "facebook": 0
-        },
-        "accounts_setup": {
-            "instagram": {
-                "login": {
-                    "username": "---",
-                    "password": "---"
-                },
-                "options": {}
-            },
-            "twitter": {
-                "login": {
-                    "username": "---",
-                    "password": "---"
-                },
-                "options": {}
-            },
-            "tiktok": {
-                "login": {
-                    "username": "---",
-                    "password": "---"
-                },
-                "options": {}
-            },
-            "facebook": {
-                "login": {
-                    "username": "---",
-                    "password": "---"
-                },
-                "options": {}
-            },
-            "youtube": {
-                "login": {
-                    "username": "---",
-                    "password": "---"
-                },
-                "options": {
-                    "subscribe_video_path": None,
-                    "subscribe_video_show_every": 5  # minute
-                }
-            }
-        },
-        "looters_setup": {
-            "instagram": {
-                "profile": {
-                    "list": ["profile1", "profile2"],
-                    "type": ["picture", "video"],
-                    "count": 10
-                },
-                "hashtag": {
-                    "list": ["#baby", "#people"],
-                    "type": ["picture", "video"],
-                    "count": 10
-                },
-                "top_search": {
-                    "type": ["picture", "video"],
-                    "count": 10
-                }
-            },
-            "twitter": {},
-            "tiktok": {},
-            "facebook": {}
-        },
-        "render_setup": {
-            "intro_video_path": "---",
-            "outro_video_path": "---",
-        },
-        "upload_setup": {},
-        "options": {
-            "all_count": None,
-            "all_type": None
-        }
-    }
+    @classmethod
+    def code(cls, value: int) -> str:
+        return cls.__code.get(value)
+
+    @classmethod
+    def str(cls, value: int) -> str:
+        return cls.__str.get(value)
 
 
 class MEDIA_TYPES:
     PIC: int = 0
     VID: int = 1
 
-    _code: Dict[int, str] = {
+    __code: Dict[int, str] = {
         PIC: "pic",
         VID: "vid"
     }
 
-    _str: Dict[int, str] = {
+    __str: Dict[int, str] = {
         PIC: "picture",
         VID: "video"
     }
+
+    @classmethod
+    def code(cls, value: int) -> str:
+        return cls.__code.get(value)
+
+    @classmethod
+    def str(cls, value: int) -> str:
+        return cls.__str.get(value)
 
 
 def create_directory(path: str) -> bool:
@@ -210,6 +147,7 @@ def create_directory(path: str) -> bool:
 # def create_temp_directory() -> None:
 #     _dir = TemporaryDirectory(prefix=f"{PPREFIX}_")
 #     _dir.write()
+
 
 def load_ui(baseinstance: QtWidgets.QWidget = None) -> str:
     ui_name = f"{os.path.basename(baseinstance.__class__.__name__)}.ui"
@@ -237,6 +175,7 @@ def set_disabled_widgets(*widgets: Tuple[QtWidgets.QWidget], state: bool = True)
 
 def create_wml_setup_file() -> None:
     with open(WML_SETUP_FILE, "w") as f:
+        #TODO: cannot get variable in SOCIAL_TYPES class
         json.dump(SOCIAL_TYPES._pattern, f, indent=4)
 
 
@@ -246,4 +185,14 @@ def read_wml_setup_file() -> Dict:
 
 
 def set_string_to_list(value: str, sep: str = ";") -> List[str]:
-    return [v.strip() for v in value.split(sep)]
+    if not value:
+        return list()
+    return [v.strip() for v in value.split(sep) if v]
+
+
+def set_plaintext_to_list(form_obj: QtWidgets.QPlainTextEdit) -> List[str]:
+    if not form_obj.isEnabled():
+        return list()
+
+    form_list: List[str] = set_string_to_list(form_obj.toPlainText())
+    return form_list

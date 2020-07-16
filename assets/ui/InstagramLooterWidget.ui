@@ -13,8 +13,18 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="1" rowspan="3">
+    <widget class="QListWidget" name="downloaded_list"/>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QPushButton" name="loot_button">
+     <property name="text">
+      <string>Loot</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" rowspan="3">
     <layout class="QGridLayout" name="gridLayout">
      <item row="2" column="0" colspan="2">
       <spacer name="verticalSpacer">
@@ -29,25 +39,25 @@
        </property>
       </spacer>
      </item>
+     <item row="0" column="2" rowspan="3">
+      <widget class="QPlainTextEdit" name="profile_text"/>
+     </item>
      <item row="3" column="0" colspan="2">
-      <widget class="QCheckBox" name="checkBox_2">
+      <widget class="QCheckBox" name="hashtag_checkbox">
        <property name="text">
         <string>Hashtag</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="2" rowspan="3">
-      <widget class="QPlainTextEdit" name="plainTextEdit"/>
+     <item row="3" column="2" rowspan="2">
+      <widget class="QPlainTextEdit" name="hashtag_text"/>
      </item>
      <item row="0" column="0" rowspan="2" colspan="2">
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QCheckBox" name="profile_checkbox">
        <property name="text">
         <string>Profile</string>
        </property>
       </widget>
-     </item>
-     <item row="3" column="2" rowspan="2">
-      <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
      </item>
      <item row="4" column="0" colspan="2">
       <spacer name="verticalSpacer_2">
@@ -63,13 +73,6 @@
       </spacer>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButton_3">
-     <property name="text">
-      <string>Loot</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

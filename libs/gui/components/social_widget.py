@@ -1,33 +1,9 @@
+from typing import List
+
 from PyQt5 import QtWidgets
 
 from libs import config
-from libs.gui.components import form_widget
-
-
-class SocialLooterWidget(QtWidgets.QWidget):
-    def __init__(self, parent: QtWidgets.QWidget) -> None:
-        super(SocialLooterWidget, self).__init__(parent)
-        config.load_ui(self)
-        self.__parent = parent
-        self.__instagram_group_form = form_widget.GroupFormWidget(
-            self,
-            "Instagram",
-            [
-                form_widget.LooterFormWidget(self, "Profile"),
-                form_widget.LooterFormWidget(self, "Hashtag")
-            ]
-        )
-        self.__9gag_group_form = form_widget.GroupFormWidget(self, "9Gag")
-
-        self.append_widget(
-            self.__instagram_group_form,
-            self.__9gag_group_form
-        )
-        # self.loot_button.clicked.connect(self.runLoot)
-
-    def append_widget(self, *widgets) -> None:
-        for widget in widgets:
-            self.social_form_layout.addWidget(widget)
+from libs.socials import  instagram
 
 
 class InstagramLooterWidget(QtWidgets.QWidget):
@@ -37,6 +13,18 @@ class InstagramLooterWidget(QtWidgets.QWidget):
 
         self.__parent = parent
 
+        self.loot_button.clicked.connect(self.start_looting)
+
+    def start_looting(self) -> None:
+        profile_list: List[str] = config.set_plaintext_to_list(self.profile_text)
+        print(profile_list)
+
+        hashtag_list: List[str] = config.set_plaintext_to_list(self.hashtag_text)
+        print(hashtag_list)
+
+        if hashtag_list:
+            for hashtag in hashtag_list:
+                instagram.loot_hashtag(hashtag, config.MEDIA_TYPES.VID, 50)
 
     # @property
     # def social_values(self) -> dict:

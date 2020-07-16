@@ -23,10 +23,6 @@ class LooterFormWidget(QtWidgets.QWidget):
         self.__parent = parent
         self.__input_title = input_title
 
-        self.form_check: QtWidgets.QCheckBox
-        self.form_input_edit: QtWidgets.QLineEdit
-        self.form_name_label: QtWidgets.QLabel
-
         self.form_name_label.setText(self.__input_title)
 
         self.form_check.clicked.connect(self._setToogleInput)
@@ -80,13 +76,6 @@ class GroupForm(QtWidgets.QGroupBox):
             if type(obj) == Form:
                 self.group_form_layout.add_widget(obj)
 
-        # spacer: QSpacerItem = QSpacerItem(0, 1000)
-
-        # self.group_form_layout.addSpacerItem(spacer)
-        # self.group_form_layout.add
-        # v = QVBoxLayout()
-        # v.
-
 
 class GroupFormWidget(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget, title: str = None, widgets: list = None) -> None:
@@ -96,9 +85,6 @@ class GroupFormWidget(QtWidgets.QWidget):
         self.__title = title + ":"
         self.__widgets = widgets
 
-        self.form_group: QtWidgets.QGroupBox
-        self.form_group_layout: QtWidgets.QVBoxLayout
-
         self.form_group.setTitle(self.__title)
 
         if self.__widgets:
@@ -106,8 +92,3 @@ class GroupFormWidget(QtWidgets.QWidget):
                 layout=self.form_group_layout,
                 widgets=self.__widgets
             )
-            # self.append_widget(*self.__widgets)
-
-    # def append_widget(self, *args) -> None:
-    #     for widget in args:
-    #         self.form_group_layout.addWidget(widget)

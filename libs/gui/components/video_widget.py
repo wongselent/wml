@@ -8,19 +8,19 @@ from libs import config, video_editor
 
 
 class ITEM_STATE:
-    start = 0
-    render = 1
-    finish = 2
-    error = 3
+    start: int = 0
+    render: int = 1
+    finish: int = 2
+    error: int = 3
 
-    __str = {
+    __str: Dict[int, str] = {
         start: "Ready",
         render: "Rendering...",
         finish: "Finished",
         error: "Error!"
     }
 
-    __bg_color = {}
+    __bg_color: Dict[int, str] = {}
 
     @classmethod
     def str(cls, value: int) -> str:
