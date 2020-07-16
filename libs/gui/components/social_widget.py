@@ -13,12 +13,11 @@ class SocialLooterWidget(QtWidgets.QWidget):
             self,
             "Instagram",
             [
-                form_widget.LooterFormWidget(self, "Profile")
+                form_widget.LooterFormWidget(self, "Profile"),
+                form_widget.LooterFormWidget(self, "Hashtag")
             ]
         )
         self.__9gag_group_form = form_widget.GroupFormWidget(self, "9Gag")
-
-        self.social_form_layout: QtWidgets.QVBoxLayout
 
         self.append_widget(
             self.__instagram_group_form,

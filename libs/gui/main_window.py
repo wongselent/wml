@@ -23,11 +23,11 @@ class MainWindow(QtWidgets.QMainWindow):
         #     tab_widget=None
         # )
 
-        # self.__social_looter_tab = tabbar_widget.TabBar(
-        #     parent=self.main_tabwidget,
-        #     tab_title="Social Looter",
-        #     tab_widget=social_widget.SocialLooterWidget(self)
-        # )
+        self.__social_looter_tab = tabbar_widget.TabBar(
+            parent=self.main_tabwidget,
+            tab_title="Social Looter",
+            tab_widget=social_widget.SocialLooterWidget(self)
+        )
 
         self.__create_video_tab = tabbar_widget.TabBar(
             parent=self.main_tabwidget,

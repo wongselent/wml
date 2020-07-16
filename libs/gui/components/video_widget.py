@@ -54,6 +54,7 @@ class VideoItemWidget(QtWidgets.QWidget):
 
         self.__setup_video_item()
 
+        self.reload_button.clicked.connect(self.__setup_video_item)
         self.render_button.clicked.connect(self.render_video)
         self.render_video_signal.connect(self.render_video)
 
@@ -79,6 +80,7 @@ class VideoItemWidget(QtWidgets.QWidget):
         self.preview_button.setHidden(state)
         self.open_button.setHidden(state)
         self.render_button.setHidden(state)
+        self.reload_button.setHidden(state)
 
     def __check_video_exists(self, video_file: str) -> None:
         if os.path.exists(video_file):
