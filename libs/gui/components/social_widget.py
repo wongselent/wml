@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets
 
 from libs import config
 from libs.socials import  instagram
-
+from instaloader import Post
 
 class InstagramLooterWidget(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget) -> None:
@@ -24,7 +24,18 @@ class InstagramLooterWidget(QtWidgets.QWidget):
 
         if hashtag_list:
             for hashtag in hashtag_list:
-                instagram.loot_hashtag(hashtag, config.MEDIA_TYPES.VID, 50)
+                instagram.loot_hashtag(
+                    hashtag_name=hashtag,
+                    loot_type=config.MEDIA_TYPES.VID,
+                    max_count=30,
+                    search_count=200,
+                    callback=lambda post: self.get_callback(post)
+                )
+
+    def get_callback(self, post: Post) -> bool:
+        self.downloaded_list: QtWidgets.QListWidget
+        print(post)
+        return True
 
     # @property
     # def social_values(self) -> dict:

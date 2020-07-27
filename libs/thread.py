@@ -44,14 +44,14 @@ class FuncWorker(QtCore.QRunnable):
 
 
 class ThreadPool(QtCore.QThreadPool):
-    def __init__(self, parent: QtWidgets.QWidget = None, max_thread_count: int = 1, **kwargs: Dict[Any, Any]) -> None:
+    def __init__(self, parent: QtWidgets.QWidget = None, max_thread_count: int = 1) -> None:
         super(ThreadPool, self).__init__(parent)
         self.__parent: QtWidgets.QWidget = parent
         self.__max_thread_count: int = max_thread_count
-        self.__kwargs: Dict[Any, Any] = kwargs
 
         self.setMaxThreadCount(self.__max_thread_count)
-        self.setExpiryTimeout(10)
+        # self.setStackSize(1)
+        self.setExpiryTimeout(5000)
 
     def run_functions(self, *funcs) -> None:
         worker = FuncWorker(*funcs)

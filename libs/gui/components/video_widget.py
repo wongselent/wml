@@ -117,7 +117,6 @@ class CreateVideoWidget(QtWidgets.QWidget):
         self.__parent: QtWidgets.QWidget = parent
         self.__threadpool_obj = threadpool_obj
         self.__video_data: Dict[str, dict] = {}
-        # self.__threadpool_obj: thread.ThreadPool = thread.ThreadPool(parent=self)
 
         self.__disable_widgets = config.set_disabled_widgets(
             self.refresh_button,
@@ -154,9 +153,7 @@ class CreateVideoWidget(QtWidgets.QWidget):
             item_widget: VideoItemWidget = self.video_obj_list.itemWidget(item)
             item_widget.render_video_signal.emit()
 
-    def get_video_path(self) -> Dict[str, dict]:
-        video_data: Dict[str, dict] = {}
-
+    def get_video_path(self) -> None:
         root_path = QtWidgets.QFileDialog.getExistingDirectory(
             parent=self,
             caption="Video Path",
@@ -164,8 +161,12 @@ class CreateVideoWidget(QtWidgets.QWidget):
         )
 
         self.video_path_edit.setText(root_path)
+        self.get_video_files(root_path)
 
-        for dirpath, dirnames, filenames, in os.walk(root_path):
+    def get_video_files(self, video_path: str) -> Dict[str, dict]:
+        video_data: Dict[str, dict] = {}
+
+        for dirpath, dirnames, filenames, in os.walk(video_path):
             for dirname in dirnames:
                 video_path = config.join_directory(dirpath, dirname)
                 video_data[dirname]: Dict[str, str] = {}
@@ -215,7 +216,10 @@ class CreateVideoWidget(QtWidgets.QWidget):
         return tuple(self.video_resolution_combo.itemData(current_index, QtCore.Qt.UserRole))
 
     def refresh_video_list(self) -> None:
-        if self.__video_data:
+        video_path = self.video_path_edit.text()
+
+        if video_path and self.__video_data:
+            self.get_video_files(video_path)
             self.__create_video_item_widget(video_data=self.__video_data)
 
     def __create_video_item_widget(self, video_data: Dict[str, dict]) -> None:

@@ -1,8 +1,10 @@
-from .. import config
-from typing import List, Dict
-from instaloader import Instaloader, Profile, Hashtag, Post
+import os
+import sys
+from typing import List, Dict, Iterator, Callable, Optional
 
-import itertools
+from instaloader import Instaloader, Hashtag, Post, exceptions
+
+from .. import config
 
 __setup_looter: Instaloader = Instaloader(
     dirname_pattern=config.OUTPUT_PATH,
@@ -40,64 +42,85 @@ def __set_pattern(loot_type: int, looter_name: str, social_dir: str) -> None:
         looter=looter_name,
         media_type=config.MEDIA_TYPES.code(loot_type),
         username="{owner_username}",
-        name="{shortcode}"
+        media_name="{shortcode}",
+        date="{date}"
     )
 
 
-def __download_from_posts(posts: Post, loot_type: int, loot_max_count: int, loot_total_count: int) -> None:
-    __setup_looter.posts_download_loop(
-        posts,
-        config.OUTPUT_PATH,
-        fast_update=True,
-        max_count=loot_max_count,
-        total_count=loot_total_count,    
-        post_filter=lambda post: not post.is_video if loot_type == config.MEDIA_TYPES.PIC else post.is_video
-    )
+def __download_from_posts(posts: Iterator[Post], loot_type: int, max_count: int, search_count: int = 10,
+                          callback: Optional[Callable[[Post], bool]] = None) -> None:
+    # current_date: datetime.date = datetime.datetime.now().date()
+    downloaded_count: int = 0
 
-    # count_downloaded = 0
+    for num, post in enumerate(posts):
+        history_pattern: str = config.HISTORY_DOWNLOADED_PATTERN.format(
+            social=config.SOCIAL_TYPES.str(config.SOCIAL_TYPES.IG),
+            date=post.date.date()
+        )
 
-    # if loot_type != config.MEDIA_TYPES.PIC:
-    #     __SETUP_LOOTER.download_videos = True
-    
-    # while count_downloaded < 20:
-    #     count_downloaded += 1
-        
-    #     print(next(posts))
+        history_file: str = config.join_directory(config.HISTORY_DOWNLOADED_PATH, history_pattern)
+
+        if not os.path.exists(history_file):
+            config.write_json_file(history_file, config.MEDIA_TYPES.history_pattern)
+
+        downloaded_data: Dict[str, List[str]] = config.read_json_file(history_file)
+
+        if downloaded_count == max_count:
+            break
+
+        post_is_video: bool = not post.is_video if loot_type == config.MEDIA_TYPES.PIC else post.is_video
+
+        if post_is_video:
+            media_url: str = post.url
+            while True:
+                try:
+                    if media_url not in downloaded_data[
+                        config.MEDIA_TYPES.str(config.MEDIA_TYPES.VID)
+                    ]:
+                        __setup_looter.download_post(post, config.OUTPUT_PATH)
+                        downloaded_count += 1
+                        downloaded_data[config.MEDIA_TYPES.str(config.MEDIA_TYPES.VID)].append(media_url)
+                        from tqdm import tqdm
+                        callback(post)
+                        print(f"[ {downloaded_count}/{max_count} | {num}/{search_count} ]:"
+                              f" {post.mediaid} - {post.date.date()} | Downloading..")
+                    else:
+                        print(f"{post.mediaid} - {post.date.date()} | Media is Downloaded!!!")
+                    break
+                except Exception as ex:
+                    print("Error", sys.exc_info())
+                    continue
+
+            config.write_json_file(history_file, downloaded_data)
+
+            if num >= search_count:
+                print("max searching count")
+                break
 
 
-    # for post in posts:
-        # if count_downloaded < loot_count:
-        #     count_downloaded += 1
-            # print(__SETUP_LOOTER.download_videos, post.is_video)
-        # print(post.typename)            
-        # if __SETUP_LOOTER.download_videos == post.is_video:
-        #     print(post.typename)
-        # else:
-        #     print(post.typename, 0)
+# def loot_profile(profile_name: str, loot_type: int = config.MEDIA_TYPES.PIC, loot_max_count: int = 1, loot_total_count: int = 100) -> Profile:
+#     __set_pattern(loot_type, "profile", config.SOCIAL_TYPES._dir[config.SOCIAL_TYPES.IG]["profile"], "{owner_username}")
+#
+#     profile: Profile = Profile.from_username(__setup_looter.context, profile_name)
+#     posts: Iterator[Post] = profile.get_posts()
+#
+#     __download_from_posts(posts, loot_type, loot_max_count, loot_total_count)
+#
+#     return profile
 
-        #     if post.is_video:
-        #         __SETUP_LOOTER.download_post(post)
-    
 
-def loot_profile(profile_name: str, loot_type: int = config.MEDIA_TYPES.PIC, loot_max_count: int = 1, loot_total_count: int = 100) -> Profile:
-    __set_pattern(loot_type, "profile", config.SOCIAL_TYPES._dir[config.SOCIAL_TYPES.IG]["profile"], "{owner_username}")
+def loot_hashtag(hashtag_name: str, loot_type: int = config.MEDIA_TYPES.PIC, max_count: int = 1,
+                 search_count: int = 10, callback: Optional[Callable[[Post], bool]] = None) -> None:
+    __set_pattern(loot_type, "hashtag", config.OUTPUT_PATH)
 
-    profile: Profile = Profile.from_username(__setup_looter.context, profile_name)
-    posts: Post = profile.get_posts()
+    try:
+        hashtag: Hashtag = Hashtag.from_name(__setup_looter.context, hashtag_name)
+        posts: Iterator[Post] = hashtag.get_all_posts()
+        __download_from_posts(posts, loot_type, max_count, search_count, callback)
+    except exceptions.QueryReturnedNotFoundException:
+        print(f"Hashtag: \"{hashtag_name}\" Not Found!!!")
+        return
 
-    __download_from_posts(posts, loot_type, loot_max_count, loot_total_count)
-
-    return profile
-
-def loot_hashtag(hashtag_name: str, loot_type: int = config.MEDIA_TYPES.PIC, loot_max_count: int = 1, loot_total_count: int = 100) -> Hashtag:
-    __set_pattern(loot_type, "hashtag", config.OUTPUT_PATH, hashtag_name)
-
-    hashtag: Hashtag = Hashtag.from_name(__setup_looter.context, hashtag_name)
-    posts: Post = hashtag.get_top_posts()
-
-    __download_from_posts(posts, loot_type, loot_max_count, loot_total_count)
-
-    return hashtag
 
 def loot_topsearch(loot_type: int = config.MEDIA_TYPES.PIC, loot_count: int = 1, loot_total_count: int = 100):
     pass

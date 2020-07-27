@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from typing import List, Tuple, Dict, Callable
+from typing import Any, List, Tuple, Dict, Callable
 
 from PyQt5 import QtWidgets
 from PyQt5.uic import loadUi
@@ -16,9 +16,12 @@ def join_directory(*args, cwd_path: bool = False) -> str:
     return os.path.join(*path).replace("\\", "/")
 
 
-PPREFIX: str = "wml"
+PREFIX: str = "wml"
 SUFFIX: str = ""
 VIDEO_FPS = 60
+
+FILENAME_PATTERN: str = f"{PREFIX}__{{social}}__{{looter}}__{{media_type}}__{{username}}__{{media_name}}__{{date}}"
+HISTORY_DOWNLOADED_PATTERN: str = f"{PREFIX}_{{social}}_{{date}}.json"
 
 try:
     BASE_PATH: str = sys._MEIPASS
@@ -29,25 +32,23 @@ CWD_PATH: str = os.path.dirname(os.getcwd())
 
 ASSETS_PATH: str = join_directory(BASE_PATH, "assets")
 UI_PATH: str = join_directory(ASSETS_PATH, "ui")
-TEMP_PATH: str = join_directory(f"{PPREFIX}-temp", cwd_path=True)  # wml-temp
-ENV_PATH: str = join_directory(f"{PPREFIX}-env", cwd_path=True)  # wml-env
+TEMP_PATH: str = join_directory(f"{PREFIX}-temp", cwd_path=True)  # wml-temp
+ENV_PATH: str = join_directory(f"{PREFIX}-env", cwd_path=True)  # wml-env
 
-BUILD_PATH: str = join_directory(f"{PPREFIX}-build", cwd_path=True)
+BUILD_PATH: str = join_directory(f"{PREFIX}-build", cwd_path=True)
 BUILD_BUILD_PATH: str = join_directory(BUILD_PATH, "build")
 BUILD_DIST_PATH: str = join_directory(BUILD_PATH, "dist")
 
-OUTPUT_PATH: str = join_directory(f"{PPREFIX}-output", cwd_path=True)  # wml-output
+OUTPUT_PATH: str = join_directory(f"{PREFIX}-output", cwd_path=True)  # wml-output
 OUTPUT_DATA_PATH: str = join_directory(OUTPUT_PATH, ".data")  # wml-output/.data
+OUTPUT_LOG_PATH: str = join_directory(OUTPUT_DATA_PATH, "log")
+HISTORY_DOWNLOADED_PATH: str = join_directory(OUTPUT_DATA_PATH, "history")
 
-VIDEO_PATH: str = join_directory(f"{PPREFIX}-video", cwd_path=True)  # wml-video
+VIDEO_PATH: str = join_directory(f"{PREFIX}-video", cwd_path=True)  # wml-video
 
-WML_SETUP_FILE: str = f"{CWD_PATH}/{PPREFIX}-setup.json"  # wml-setup.json
-WML_CONDA_ENV_FILE: str = f"{ENV_PATH}/{PPREFIX}-conda-env.yml"
-WML_PIP_REQUIREMENT_FILE: str = f"{ENV_PATH}/{PPREFIX}-pip-requirement.txt"
-
-# VIDEO_WIDTH, VIDEO_HEIGHT = 1280, 720
-
-FILENAME_PATTERN = f"{PPREFIX}__{{social}}__{{looter}}__{{media_type}}__{{username}}__{{name}}"
+WML_SETUP_FILE: str = f"{CWD_PATH}/{PREFIX}-setup.json"  # wml-setup.json
+WML_CONDA_ENV_FILE: str = f"{ENV_PATH}/{PREFIX}-conda-env.yml"
+WML_PIP_REQUIREMENT_FILE: str = f"{ENV_PATH}/{PREFIX}-pip-requirement.txt"
 
 
 class VIDEO_RESOLUTION:
@@ -128,6 +129,11 @@ class MEDIA_TYPES:
         VID: "video"
     }
 
+    history_pattern: Dict[str, List[str]] = {
+        __str[PIC]: [],
+        __str[VID]: []
+    }
+
     @classmethod
     def code(cls, value: int) -> str:
         return cls.__code.get(value)
@@ -138,11 +144,8 @@ class MEDIA_TYPES:
 
 
 def create_directory(path: str) -> bool:
-    if not os.path.exists(path):
-        os.makedirs(path)
-        return True
-    return False
-
+    os.makedirs(path, exist_ok=True)
+    return os.path.exists(path)
 
 # def create_temp_directory() -> None:
 #     _dir = TemporaryDirectory(prefix=f"{PPREFIX}_")
@@ -182,6 +185,17 @@ def create_wml_setup_file() -> None:
 def read_wml_setup_file() -> Dict:
     with open(WML_SETUP_FILE, "r") as f:
         return json.load(f)
+
+
+def read_json_file(json_file: str) -> Dict[Any, Any]:
+    with open(json_file, "r") as f:
+        return json.load(f)
+
+
+def write_json_file(json_file: str, data: Dict) -> None:
+    create_directory(os.path.dirname(json_file))
+    with open(json_file, "w") as f:
+        json.dump(data, f, indent=4)
 
 
 def set_string_to_list(value: str, sep: str = ";") -> List[str]:
